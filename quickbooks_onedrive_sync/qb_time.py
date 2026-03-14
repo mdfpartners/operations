@@ -14,7 +14,7 @@ import os
 from datetime import date, timedelta
 from typing import Any
 
-import requests
+from ssl_session import build_session
 
 _BASE = "https://rest.tsheets.com/api/v1"
 
@@ -22,8 +22,7 @@ _BASE = "https://rest.tsheets.com/api/v1"
 class QBTimeClient:
     def __init__(self, access_token: str | None = None) -> None:
         token = access_token or os.environ["QBT_ACCESS_TOKEN"]
-        self._session = requests.Session()
-        self._session.headers.update({"Authorization": f"Bearer {token}"})
+        self._session = build_session({"Authorization": f"Bearer {token}"})
 
     # ── low-level ──────────────────────────────────────────────────────────
 

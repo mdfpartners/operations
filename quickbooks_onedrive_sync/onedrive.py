@@ -15,7 +15,8 @@ import os
 from typing import Any
 
 import msal
-import requests
+
+from ssl_session import build_session
 
 
 _GRAPH = "https://graph.microsoft.com/v1.0"
@@ -39,7 +40,7 @@ class OneDriveClient:
             authority=authority,
             client_credential=client_secret,
         )
-        self._session = requests.Session()
+        self._session = build_session()
         self._refresh_token()
 
     # ── auth ───────────────────────────────────────────────────────────────
