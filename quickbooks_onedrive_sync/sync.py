@@ -36,11 +36,11 @@ from dotenv import load_dotenv
 from qb_time import QBTimeClient, date_range_for_days_back
 from onedrive import OneDriveClient
 
-# Column layout in the spreadsheet
-HEADER = ["Date", "User", "Job Code", "Hours", "Notes"]
+# Column layout — must match the Raw Data sheet exactly
+HEADER = ["Date", "Customer", "Employee", "Hours"]
 
 # Name of the worksheet to write into
-SHEET_NAME = "Time Report"
+SHEET_NAME = "Raw Data"
 
 
 def parse_args() -> argparse.Namespace:
@@ -58,8 +58,8 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--user-id",
-        default="me",
-        help="OneDrive user ID or UPN (default: 'me')",
+        default=os.environ.get("ONEDRIVE_USER", "me"),
+        help="OneDrive user UPN (default: ONEDRIVE_USER env var)",
     )
     p.add_argument(
         "--dry-run",
@@ -82,8 +82,9 @@ def parse_args() -> argparse.Namespace:
 
 
 def rows_to_table(timesheets: list[dict]) -> list[list]:
+    # Columns: Date, Customer (jobcode), Employee (user), Hours
     return [
-        [ts["date"], ts["user"], ts["jobcode"], ts["hours"], ts["notes"]]
+        [ts["date"], ts["jobcode"], ts["user"], ts["hours"]]
         for ts in timesheets
     ]
 

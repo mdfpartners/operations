@@ -12,6 +12,7 @@ Graph API docs: https://learn.microsoft.com/en-us/graph/api/resources/excel
 from __future__ import annotations
 
 import os
+import urllib.parse
 from typing import Any
 
 import msal
@@ -92,8 +93,9 @@ class OneDriveClient:
 
     def resolve_file_id(self, onedrive_path: str, user_id: str = "me") -> str:
         """Return the Graph item ID for a file path like 'Reports/Time Report.xlsx'."""
-        encoded = requests.utils.quote(onedrive_path)
-        url = f"{_GRAPH}/{user_id}/drive/root:/{encoded}"
+        encoded = urllib.parse.quote(onedrive_path)
+        prefix = "me" if user_id == "me" else f"users/{urllib.parse.quote(user_id)}"
+        url = f"{_GRAPH}/{prefix}/drive/root:/{encoded}"
         data = self._get(url)
         return data["id"]
 
@@ -105,7 +107,8 @@ class OneDriveClient:
     # ── workbook / worksheet helpers ───────────────────────────────────────
 
     def _wb_url(self, user_id: str, item_id: str, *parts: str) -> str:
-        base = f"{_GRAPH}/{user_id}/drive/items/{item_id}/workbook"
+        prefix = "me" if user_id == "me" else f"users/{urllib.parse.quote(user_id)}"
+        base = f"{_GRAPH}/{prefix}/drive/items/{item_id}/workbook"
         if parts:
             base += "/" + "/".join(parts)
         return base
