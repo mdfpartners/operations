@@ -1,0 +1,13 @@
+# Secrets — never commit
+quickbooks_onedrive_sync/.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Logs
+*.log
