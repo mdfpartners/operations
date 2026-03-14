@@ -8,24 +8,58 @@ from __future__ import annotations
 
 import os
 from datetime import date, timedelta
+from pathlib import Path
 from typing import Any
 
 import requests
-
+from dotenv import set_key
 
 _BASE = "https://rest.tsheets.com/api/v1"
+_TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
+_ENV_FILE = Path(__file__).parent / ".env"
+
+
+def _refresh_access_token(client_id: str, client_secret: str, refresh_token: str) -> str:
+    """Exchange a refresh token for a new access token and persist it to .env."""
+    resp = requests.post(
+        _TOKEN_URL,
+        data={"grant_type": "refresh_token", "refresh_token": refresh_token},
+        auth=(client_id, client_secret),
+    )
+    resp.raise_for_status()
+    tokens = resp.json()
+    new_access = tokens["access_token"]
+    # Some flows also rotate the refresh token
+    new_refresh = tokens.get("refresh_token", refresh_token)
+    set_key(str(_ENV_FILE), "QBT_ACCESS_TOKEN", new_access)
+    set_key(str(_ENV_FILE), "QBT_REFRESH_TOKEN", new_refresh)
+    os.environ["QBT_ACCESS_TOKEN"] = new_access
+    os.environ["QBT_REFRESH_TOKEN"] = new_refresh
+    return new_access
 
 
 class QBTimeClient:
     def __init__(self, access_token: str | None = None) -> None:
+        self._client_id = os.environ.get("QBT_CLIENT_ID", "")
+        self._client_secret = os.environ.get("QBT_CLIENT_SECRET", "")
+        self._refresh_token = os.environ.get("QBT_REFRESH_TOKEN", "")
         token = access_token or os.environ["QBT_ACCESS_TOKEN"]
         self._session = requests.Session()
+        self._session.headers.update({"Authorization": f"Bearer {token}"})
+
+    def _set_token(self, token: str) -> None:
         self._session.headers.update({"Authorization": f"Bearer {token}"})
 
     # ── low-level ──────────────────────────────────────────────────────────
 
     def _get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict:
         resp = self._session.get(f"{_BASE}/{endpoint}", params=params)
+        if resp.status_code == 401 and self._refresh_token and self._client_id:
+            new_token = _refresh_access_token(
+                self._client_id, self._client_secret, self._refresh_token
+            )
+            self._set_token(new_token)
+            resp = self._session.get(f"{_BASE}/{endpoint}", params=params)
         resp.raise_for_status()
         return resp.json()
 
