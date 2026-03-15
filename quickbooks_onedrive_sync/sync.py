@@ -35,6 +35,7 @@ from dotenv import load_dotenv
 
 from qb_time import QBTimeClient, date_range_for_days_back
 from onedrive import OneDriveClient
+from summaries import rebuild_summaries
 
 # Column layout — must match the Raw Data sheet exactly
 HEADER = ["Date", "Customer", "Employee", "Hours"]
@@ -164,6 +165,9 @@ def main() -> None:
     print(f"[sync] Appending {len(rows)} rows to '{SHEET_NAME}' …")
     start_row = od.append_rows(user_id, item_id, SHEET_NAME, rows, header=HEADER)
     print(f"[sync] Done. Wrote rows starting at row {start_row}.")
+
+    # ── 7. Rebuild all summary tabs from Raw Data ─────────────────────────
+    rebuild_summaries(od, user_id, item_id)
 
 
 if __name__ == "__main__":

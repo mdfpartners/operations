@@ -205,6 +205,49 @@ class OneDriveClient:
         self.update_range(user_id, item_id, sheet_name, start_cell, rows)
         return next_row
 
+    def rewrite_sheet(
+        self,
+        user_id: str,
+        item_id: str,
+        sheet_name: str,
+        values: list[list],
+    ) -> None:
+        """Clear a worksheet's contents and write new values starting at A1.
+
+        The header row (row 1) is written with text number-format ("@") so that
+        strings such as "3/14" or "Jan 2026" are not auto-converted by Excel to
+        date serial numbers.
+        """
+        # Clear existing content so stale columns/rows don't linger
+        clear_url = self._wb_url(
+            user_id, item_id,
+            f"worksheets('{sheet_name}')", "usedRange/clear",
+        )
+        try:
+            self._post(clear_url, json={"applyTo": "Contents"})
+        except Exception:
+            pass  # sheet may already be empty
+
+        if not values:
+            return
+
+        # Write header row with explicit text format to prevent date auto-conversion
+        n_cols = len(values[0])
+        end_header_cell = _offset_cell("A1", 0, n_cols - 1)
+        header_url = self._wb_url(
+            user_id, item_id,
+            f"worksheets('{sheet_name}')",
+            f"range(address='A1:{end_header_cell}')",
+        )
+        self._patch(header_url, json={
+            "values":       [values[0]],
+            "numberFormat": [["@"] * n_cols],
+        })
+
+        # Write data rows (row 2 onwards) as plain values
+        if len(values) > 1:
+            self.update_range(user_id, item_id, sheet_name, "A2", values[1:])
+
     def find_rows_by_date(
         self,
         user_id: str,
