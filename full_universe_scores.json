@@ -1,0 +1,347 @@
+{
+  "scores": {
+    "561720": 34.2,
+    "561210": 36.7,
+    "561730": 31.8,
+    "561790": 33.2,
+    "561612": 43.5,
+    "561611": 51.6,
+    "561320": 36.0,
+    "561330": 36.0,
+    "561110": 39.9,
+    "561410": 43.7,
+    "561421": 48.7,
+    "561499": 46.6,
+    "488190": 40.2,
+    "493110": 56.6,
+    "532490": 44.0,
+    "238220": 31.4,
+    "238210": 18.7,
+    "238990": 39.8,
+    "811310": 30.3,
+    "562910": 33.0,
+    "561990": 44.0,
+    "237310": 38.3,
+    "541513": 49.8,
+    "561621": 29.4,
+    "541611": 58.1,
+    "541614": 48.7,
+    "541618": 49.2,
+    "541690": 44.9,
+    "541620": 40.7,
+    "541330": 57.1,
+    "541990": 20.1
+  },
+  "metrics": {
+    "561720": {
+      "total_obs": 218943486.63,
+      "total_cnt": 1012,
+      "avg_val": 216347.31880434783,
+      "growth": 36.13600068054247,
+      "awardees": 166,
+      "awardees_num": 166,
+      "label": "Janitorial Services",
+      "src": "prev"
+    },
+    "561210": {
+      "total_obs": 322230227.71,
+      "total_cnt": 788,
+      "avg_val": 408921.6087690355,
+      "growth": -4.645984672267293,
+      "awardees": 162,
+      "awardees_num": 162,
+      "label": "Facilities Support Services",
+      "src": "prev"
+    },
+    "561730": {
+      "total_obs": 64199041.65,
+      "total_cnt": 601,
+      "avg_val": 106820.36880199666,
+      "growth": -3.655094751736739,
+      "awardees": 148,
+      "awardees_num": 148,
+      "label": "Landscaping Services",
+      "src": "prev"
+    },
+    "561790": {
+      "total_obs": 12509883.42,
+      "total_cnt": 134,
+      "avg_val": 93357.33895522388,
+      "growth": -14.051811544243836,
+      "awardees": 60,
+      "awardees_num": 60,
+      "label": "Other Bldg Cleaning Services",
+      "src": "prev"
+    },
+    "561612": {
+      "total_obs": 257326824.42000002,
+      "total_cnt": 363,
+      "avg_val": 708889.3234710745,
+      "growth": -20.305741161343573,
+      "awardees": 46,
+      "awardees_num": 46,
+      "label": "Security Guards & Patrol",
+      "src": "prev"
+    },
+    "561611": {
+      "total_obs": 26532829.269999996,
+      "total_cnt": 20,
+      "avg_val": 1326641.4634999998,
+      "growth": 42.91172008207543,
+      "awardees": 6,
+      "awardees_num": 6,
+      "label": "Investigation Services",
+      "src": "prev"
+    },
+    "561320": {
+      "total_obs": 358887237.39,
+      "total_cnt": 812,
+      "avg_val": 441979.3563916256,
+      "growth": -46.2125111095935,
+      "awardees": 92,
+      "awardees_num": 92,
+      "label": "Temporary Staffing",
+      "src": "prev"
+    },
+    "561330": {
+      "total_obs": 3715963.08,
+      "total_cnt": 8,
+      "avg_val": 464495.385,
+      "growth": -27.760021932362182,
+      "awardees": 3,
+      "awardees_num": 3,
+      "label": "Professional Employer Orgs",
+      "src": "prev"
+    },
+    "561110": {
+      "total_obs": 48151493.58,
+      "total_cnt": 106,
+      "avg_val": 454259.3733962264,
+      "growth": -338.882507800785,
+      "awardees": 32,
+      "awardees_num": 32,
+      "label": "Office Admin Services",
+      "src": "prev"
+    },
+    "561410": {
+      "total_obs": 5239218.68,
+      "total_cnt": 116,
+      "avg_val": 45165.67827586207,
+      "growth": 172.23236530445905,
+      "awardees": 17,
+      "awardees_num": 17,
+      "label": "Document Prep Services",
+      "src": "prev"
+    },
+    "561421": {
+      "total_obs": 24695288.02,
+      "total_cnt": 55,
+      "avg_val": 449005.23672727274,
+      "growth": 5.0052377748765835,
+      "awardees": 10,
+      "awardees_num": 10,
+      "label": "Telephone Answering Services",
+      "src": "prev"
+    },
+    "561499": {
+      "total_obs": 9056062.09,
+      "total_cnt": 37,
+      "avg_val": 244758.43486486486,
+      "growth": 71.64501352467583,
+      "awardees": 9,
+      "awardees_num": 9,
+      "label": "Other Business Support Services",
+      "src": "prev"
+    },
+    "488190": {
+      "total_obs": 55839197.92,
+      "total_cnt": 140,
+      "avg_val": 398851.4137142857,
+      "growth": -25.086561184839525,
+      "awardees": 26,
+      "awardees_num": 26,
+      "label": "Other Support for Air Transport",
+      "src": "prev"
+    },
+    "493110": {
+      "total_obs": 46213717.69,
+      "total_cnt": 25,
+      "avg_val": 1848548.7075999998,
+      "growth": 19.04540391333176,
+      "awardees": 12,
+      "awardees_num": 12,
+      "label": "General Warehousing & Storage",
+      "src": "prev"
+    },
+    "532490": {
+      "total_obs": 23217129.939999998,
+      "total_cnt": 110,
+      "avg_val": 211064.81763636362,
+      "growth": 202.89397601554114,
+      "awardees": 39,
+      "awardees_num": 39,
+      "label": "Other Equip Rental & Leasing",
+      "src": "prev"
+    },
+    "238220": {
+      "total_obs": 426307648.23,
+      "total_cnt": 1333,
+      "avg_val": 319810.68884471117,
+      "growth": 49.98668741524217,
+      "awardees": "200+",
+      "awardees_num": 250,
+      "label": "Plumbing/HVAC Contractors",
+      "src": "new"
+    },
+    "238210": {
+      "total_obs": 254594378.38,
+      "total_cnt": 636,
+      "avg_val": 400305.6263836478,
+      "growth": -52.00712998844125,
+      "awardees": "200+",
+      "awardees_num": 250,
+      "label": "Electrical Contractors",
+      "src": "new"
+    },
+    "238990": {
+      "total_obs": 52117438.21,
+      "total_cnt": 155,
+      "avg_val": 336241.53683870967,
+      "growth": -5.840549669294047,
+      "awardees": 90,
+      "awardees_num": 90,
+      "label": "Other Specialty Trade Contractors",
+      "src": "new"
+    },
+    "811310": {
+      "total_obs": 45994070.82,
+      "total_cnt": 509,
+      "avg_val": 90361.63225933202,
+      "growth": 83.25796145383674,
+      "awardees": 164,
+      "awardees_num": 164,
+      "label": "Commercial Machinery Repair",
+      "src": "new"
+    },
+    "562910": {
+      "total_obs": 11812996.58,
+      "total_cnt": 127,
+      "avg_val": 93015.72110236221,
+      "growth": -47.59948258622953,
+      "awardees": 61,
+      "awardees_num": 61,
+      "label": "Remediation Services",
+      "src": "new"
+    },
+    "561990": {
+      "total_obs": 126135169.77000001,
+      "total_cnt": 505,
+      "avg_val": 249772.61340594062,
+      "growth": 63.56025957131492,
+      "awardees": 61,
+      "awardees_num": 61,
+      "label": "All Other Support Services",
+      "src": "new"
+    },
+    "237310": {
+      "total_obs": 83573070.57000001,
+      "total_cnt": 124,
+      "avg_val": 673976.3755645162,
+      "growth": -51.972551267817494,
+      "awardees": 72,
+      "awardees_num": 72,
+      "label": "Highway/Street/Bridge Construction",
+      "src": "new"
+    },
+    "541513": {
+      "total_obs": 153909731.21,
+      "total_cnt": 62,
+      "avg_val": 2482415.019516129,
+      "growth": 1.1548263756442425,
+      "awardees": 25,
+      "awardees_num": 25,
+      "label": "Computer Facilities Mgmt",
+      "src": "new"
+    },
+    "561621": {
+      "total_obs": 75786008.66,
+      "total_cnt": 517,
+      "avg_val": 146588.02448742746,
+      "growth": -26.191576102386144,
+      "awardees": 109,
+      "awardees_num": 109,
+      "label": "Security Systems Services",
+      "src": "new"
+    },
+    "541611": {
+      "total_obs": 1532750984.15,
+      "total_cnt": 1032,
+      "avg_val": 1485223.8218507753,
+      "growth": 45.46076060255472,
+      "awardees": "100+",
+      "awardees_num": 250,
+      "label": "Admin Mgmt Consulting",
+      "src": "consult"
+    },
+    "541614": {
+      "total_obs": 114187053.97,
+      "total_cnt": 93,
+      "avg_val": 1227817.784623656,
+      "growth": 6.74319748391376,
+      "awardees": 36,
+      "awardees_num": 36,
+      "label": "Process/Logistics Consulting",
+      "src": "consult"
+    },
+    "541618": {
+      "total_obs": 17397431.05,
+      "total_cnt": 15,
+      "avg_val": 1159828.7366666668,
+      "growth": 82.97397283203524,
+      "awardees": 12,
+      "awardees_num": 12,
+      "label": "Other Mgmt Consulting",
+      "src": "consult"
+    },
+    "541690": {
+      "total_obs": 40290514.95,
+      "total_cnt": 106,
+      "avg_val": 380099.19764150947,
+      "growth": 47.050501678387704,
+      "awardees": 45,
+      "awardees_num": 45,
+      "label": "Other Scientific/Tech Consulting",
+      "src": "consult"
+    },
+    "541620": {
+      "total_obs": 51064071.230000004,
+      "total_cnt": 247,
+      "avg_val": 206737.13048582998,
+      "growth": 22.851035005526242,
+      "awardees": 70,
+      "awardees_num": 70,
+      "label": "Environmental Consulting",
+      "src": "consult"
+    },
+    "541330": {
+      "total_obs": 1529545137.33,
+      "total_cnt": 2061,
+      "avg_val": 742137.3786171761,
+      "growth": 45.521963705629936,
+      "awardees": "100+",
+      "awardees_num": 250,
+      "label": "Engineering Services",
+      "src": "consult"
+    },
+    "541990": {
+      "total_obs": 270884895.12,
+      "total_cnt": 235,
+      "avg_val": 1152701.681361702,
+      "growth": -41.10692391081191,
+      "awardees": "100+",
+      "awardees_num": 250,
+      "label": "Other Prof/Sci/Tech Services",
+      "src": "consult"
+    }
+  }
+}

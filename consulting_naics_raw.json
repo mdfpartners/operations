@@ -1,0 +1,332 @@
+{
+  "541611": {
+    "label": "Administrative Mgmt Consulting",
+    "yearly": {
+      "2022": {
+        "obligations": 383646623.04
+      },
+      "2023": {
+        "obligations": 591049065.21
+      },
+      "2024": {
+        "obligations": 558055295.9
+      }
+    },
+    "total": 1532750984.15,
+    "count": 1032,
+    "avg": 1485223.8218507753,
+    "growth": 45.46076060255472,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        965976122.66
+      ],
+      [
+        "Department of Defense",
+        203922515.28
+      ],
+      [
+        "Department of Homeland Security",
+        113893461.27
+      ]
+    ]
+  },
+  "541614": {
+    "label": "Process/Logistics Consulting",
+    "yearly": {
+      "2022": {
+        "obligations": 35655416.97
+      },
+      "2023": {
+        "obligations": 40471904.85
+      },
+      "2024": {
+        "obligations": 38059732.15
+      }
+    },
+    "total": 114187053.97,
+    "count": 93,
+    "avg": 1227817.784623656,
+    "growth": 6.74319748391376,
+    "awardees": 36,
+    "agencies": [
+      [
+        "Department of Defense",
+        46528335.17
+      ],
+      [
+        "Department of Veterans Affairs",
+        43375771.79
+      ],
+      [
+        "Department of Homeland Security",
+        15004025.96
+      ]
+    ]
+  },
+  "541618": {
+    "label": "Other Mgmt Consulting",
+    "yearly": {
+      "2022": {
+        "obligations": 5252478.11
+      },
+      "2023": {
+        "obligations": 2534285.0700000003
+      },
+      "2024": {
+        "obligations": 9610667.87
+      }
+    },
+    "total": 17397431.05,
+    "count": 15,
+    "avg": 1159828.7366666668,
+    "growth": 82.97397283203524,
+    "awardees": 12,
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        11984199.94
+      ],
+      [
+        "Department of State",
+        3666462.87
+      ],
+      [
+        "Department of Energy",
+        1085463.52
+      ]
+    ]
+  },
+  "541690": {
+    "label": "Other Scientific/Technical Consulting",
+    "yearly": {
+      "2022": {
+        "obligations": 13551177.74
+      },
+      "2023": {
+        "obligations": 6812262.36
+      },
+      "2024": {
+        "obligations": 19927074.85
+      }
+    },
+    "total": 40290514.95,
+    "count": 106,
+    "avg": 380099.19764150947,
+    "growth": 47.050501678387704,
+    "awardees": 45,
+    "agencies": [
+      [
+        "Department of Defense",
+        19063059.24
+      ],
+      [
+        "Department of Veterans Affairs",
+        16883581.78
+      ],
+      [
+        "Department of Justice",
+        2623160.96
+      ]
+    ]
+  },
+  "541620": {
+    "label": "Environmental Consulting",
+    "yearly": {
+      "2022": {
+        "obligations": 15940147.74
+      },
+      "2023": {
+        "obligations": 15541287.01
+      },
+      "2024": {
+        "obligations": 19582636.48
+      }
+    },
+    "total": 51064071.230000004,
+    "count": 247,
+    "avg": 206737.13048582998,
+    "growth": 22.851035005526242,
+    "awardees": 70,
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        25175791.23
+      ],
+      [
+        "Department of Commerce",
+        14045017.36
+      ],
+      [
+        "Department of Defense",
+        7542812.95
+      ]
+    ]
+  },
+  "541519": {
+    "label": "Other Computer Services",
+    "yearly": {
+      "2022": {
+        "obligations": 1495382280.01
+      },
+      "2023": {
+        "obligations": 1783051481.23
+      },
+      "2024": {
+        "obligations": 1912871049.42
+      }
+    },
+    "total": 5191304810.66,
+    "count": 3875,
+    "avg": 1339691.5640412902,
+    "growth": 27.91853126728292,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        3947954030.25
+      ],
+      [
+        "Department of Homeland Security",
+        268845862.96
+      ],
+      [
+        "Department of Defense",
+        205373991.93
+      ]
+    ]
+  },
+  "541715": {
+    "label": "R&D Physical/Engineering Sciences",
+    "yearly": {
+      "2022": {
+        "obligations": 24719362.17
+      },
+      "2023": {
+        "obligations": 14585281.01
+      },
+      "2024": {
+        "obligations": 13713276.65
+      }
+    },
+    "total": 53017919.83,
+    "count": 10,
+    "avg": 5301791.983,
+    "growth": -44.52414849666811,
+    "awardees": 9,
+    "agencies": [
+      [
+        "Department of Defense",
+        41482511.75
+      ],
+      [
+        "Department of Veterans Affairs",
+        9280466.8
+      ],
+      [
+        "Department of Commerce",
+        2254941.28
+      ]
+    ]
+  },
+  "541330": {
+    "label": "Engineering Services",
+    "yearly": {
+      "2022": {
+        "obligations": 411834452.82
+      },
+      "2023": {
+        "obligations": 518401101.55
+      },
+      "2024": {
+        "obligations": 599309582.96
+      }
+    },
+    "total": 1529545137.33,
+    "count": 2061,
+    "avg": 742137.3786171761,
+    "growth": 45.521963705629936,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        860342368.79
+      ],
+      [
+        "Department of Defense",
+        501177574.35
+      ],
+      [
+        "Department of Homeland Security",
+        66313125.79
+      ]
+    ]
+  },
+  "541990": {
+    "label": "All Other Prof/Scientific/Tech Svcs",
+    "yearly": {
+      "2022": {
+        "obligations": 120620910.16
+      },
+      "2023": {
+        "obligations": 79226620.56
+      },
+      "2024": {
+        "obligations": 71037364.4
+      }
+    },
+    "total": 270884895.12,
+    "count": 235,
+    "avg": 1152701.681361702,
+    "growth": -41.10692391081191,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Defense",
+        186840739.84
+      ],
+      [
+        "Department of Veterans Affairs",
+        58990933.36
+      ],
+      [
+        "Department of Homeland Security",
+        16309490.31
+      ]
+    ]
+  },
+  "561110": {
+    "label": "Office Admin Services",
+    "yearly": {
+      "2022": {
+        "obligations": -12281795.98
+      },
+      "2023": {
+        "obligations": 31094227.32
+      },
+      "2024": {
+        "obligations": 29339062.24
+      }
+    },
+    "total": 48151493.58,
+    "count": 49,
+    "avg": 982683.5424489796,
+    "growth": -338.882507800785,
+    "awardees": 32,
+    "agencies": [
+      [
+        "Department of Homeland Security",
+        58905748.16
+      ],
+      [
+        "Department of Defense",
+        17780844.78
+      ],
+      [
+        "Department of Agriculture",
+        766887.13
+      ]
+    ]
+  }
+}
