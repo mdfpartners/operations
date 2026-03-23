@@ -1,0 +1,589 @@
+{
+  "561720": {
+    "label": "Janitorial Services",
+    "yearly": {
+      "2022": {
+        "obligations": 62333331.32,
+        "contracts": 313
+      },
+      "2023": {
+        "obligations": 71752050.96,
+        "contracts": 354
+      },
+      "2024": {
+        "obligations": 84858104.35,
+        "contracts": 345
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 202155173.15
+      },
+      {
+        "name": "Department of Transportation",
+        "amount": 8170019.36
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 4742983.0
+      },
+      {
+        "name": "Department of Homeland Security",
+        "amount": 1892232.37
+      },
+      {
+        "name": "Department of the Interior",
+        "amount": 835891.43
+      }
+    ],
+    "unique_awardees": 166
+  },
+  "561210": {
+    "label": "Facilities Support Services",
+    "yearly": {
+      "2022": {
+        "obligations": 114480139.63,
+        "contracts": 240
+      },
+      "2023": {
+        "obligations": 98588678.19,
+        "contracts": 253
+      },
+      "2024": {
+        "obligations": 109161409.89,
+        "contracts": 295
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Defense",
+        "amount": 145573774.61
+      },
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 129608018.74
+      },
+      {
+        "name": "Nuclear Regulatory Commission",
+        "amount": 10479448.9
+      },
+      {
+        "name": "Department of Homeland Security",
+        "amount": 9984113.43
+      },
+      {
+        "name": "Environmental Protection Agency",
+        "amount": 5774861.98
+      }
+    ],
+    "unique_awardees": 162
+  },
+  "561730": {
+    "label": "Landscaping Services",
+    "yearly": {
+      "2022": {
+        "obligations": 22621103.04,
+        "contracts": 197
+      },
+      "2023": {
+        "obligations": 19783658.32,
+        "contracts": 186
+      },
+      "2024": {
+        "obligations": 21794280.29,
+        "contracts": 218
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 55454855.91
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 7943316.78
+      },
+      {
+        "name": "Department of Justice",
+        "amount": 373953.84
+      },
+      {
+        "name": "Department of Transportation",
+        "amount": 344639.16
+      },
+      {
+        "name": "Department of Commerce",
+        "amount": 89877.4
+      }
+    ],
+    "unique_awardees": 148
+  },
+  "561740": {
+    "label": "Carpet/Upholstery Cleaning",
+    "yearly": {
+      "2022": {
+        "obligations": -76566.02999999998,
+        "contracts": 2
+      },
+      "2023": {
+        "obligations": 39254.32,
+        "contracts": 2
+      },
+      "2024": {
+        "obligations": 38656.92,
+        "contracts": 1
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 1345.21
+      }
+    ],
+    "unique_awardees": 3
+  },
+  "561790": {
+    "label": "Other Services to Buildings",
+    "yearly": {
+      "2022": {
+        "obligations": 4698557.89,
+        "contracts": 44
+      },
+      "2023": {
+        "obligations": 3773000.14,
+        "contracts": 43
+      },
+      "2024": {
+        "obligations": 4038325.39,
+        "contracts": 47
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 11731505.42
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 724785.0
+      },
+      {
+        "name": "Department of the Interior",
+        "amount": 53593.0
+      },
+      {
+        "name": "Department of Agriculture",
+        "amount": 0.0
+      }
+    ],
+    "unique_awardees": 60
+  },
+  "561612": {
+    "label": "Security Guards & Patrol",
+    "yearly": {
+      "2022": {
+        "obligations": 93981863.2,
+        "contracts": 119
+      },
+      "2023": {
+        "obligations": 88446811.9,
+        "contracts": 135
+      },
+      "2024": {
+        "obligations": 74898149.32,
+        "contracts": 109
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 143428644.89
+      },
+      {
+        "name": "National Aeronautics and Space Administration",
+        "amount": 53413129.7
+      },
+      {
+        "name": "Department of Health and Human Services",
+        "amount": 26162093.34
+      },
+      {
+        "name": "Department of Energy",
+        "amount": 9431614.63
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 8772665.14
+      }
+    ],
+    "unique_awardees": 46
+  },
+  "561611": {
+    "label": "Investigation/Security Services",
+    "yearly": {
+      "2022": {
+        "obligations": 7334155.55,
+        "contracts": 7
+      },
+      "2023": {
+        "obligations": 8717305.87,
+        "contracts": 6
+      },
+      "2024": {
+        "obligations": 10481367.85,
+        "contracts": 7
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 15845778.68
+      },
+      {
+        "name": "Department of Homeland Security",
+        "amount": 9238166.52
+      },
+      {
+        "name": "Securities and Exchange Commission",
+        "amount": 1209837.12
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 239046.95
+      }
+    ],
+    "unique_awardees": 6
+  },
+  "561320": {
+    "label": "Temporary Staffing",
+    "yearly": {
+      "2022": {
+        "obligations": 146254979.89,
+        "contracts": 274
+      },
+      "2023": {
+        "obligations": 133965376.44,
+        "contracts": 271
+      },
+      "2024": {
+        "obligations": 78666881.06,
+        "contracts": 267
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 318800771.96
+      },
+      {
+        "name": "General Services Administration",
+        "amount": 25113420.63
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 12864057.07
+      },
+      {
+        "name": "Department of Homeland Security",
+        "amount": 1196687.34
+      },
+      {
+        "name": "Department of Health and Human Services",
+        "amount": 747205.3
+      }
+    ],
+    "unique_awardees": 92
+  },
+  "561330": {
+    "label": "Professional Employer Orgs",
+    "yearly": {
+      "2022": {
+        "obligations": 1141764.84,
+        "contracts": 2
+      },
+      "2023": {
+        "obligations": 1749387.57,
+        "contracts": 3
+      },
+      "2024": {
+        "obligations": 824810.67,
+        "contracts": 3
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Defense",
+        "amount": 3276399.92
+      },
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 439563.16
+      }
+    ],
+    "unique_awardees": 3
+  },
+  "561310": {
+    "label": "Employment Placement Agencies",
+    "yearly": {
+      "2022": {
+        "obligations": 0,
+        "contracts": 0
+      },
+      "2023": {
+        "obligations": 0,
+        "contracts": 0
+      },
+      "2024": {
+        "obligations": 0,
+        "contracts": 0
+      }
+    },
+    "top_agencies": [],
+    "unique_awardees": 0
+  },
+  "561110": {
+    "label": "Office Admin Services",
+    "yearly": {
+      "2022": {
+        "obligations": -12281795.98,
+        "contracts": 36
+      },
+      "2023": {
+        "obligations": 31094227.32,
+        "contracts": 38
+      },
+      "2024": {
+        "obligations": 29339062.24,
+        "contracts": 32
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Homeland Security",
+        "amount": 58905748.16
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 17780844.78
+      },
+      {
+        "name": "Department of Agriculture",
+        "amount": 766887.13
+      },
+      {
+        "name": "Department of the Treasury",
+        "amount": -0.08
+      },
+      {
+        "name": "Department of State",
+        "amount": -82435.32
+      }
+    ],
+    "unique_awardees": 32
+  },
+  "561410": {
+    "label": "Document Preparation",
+    "yearly": {
+      "2022": {
+        "obligations": 1064244.77,
+        "contracts": 37
+      },
+      "2023": {
+        "obligations": 1277755.2,
+        "contracts": 37
+      },
+      "2024": {
+        "obligations": 2897218.71,
+        "contracts": 42
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 3939708.6
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 1264413.58
+      },
+      {
+        "name": "Department of State",
+        "amount": 35096.5
+      }
+    ],
+    "unique_awardees": 17
+  },
+  "561421": {
+    "label": "Telephone Answering Services",
+    "yearly": {
+      "2022": {
+        "obligations": 7826768.23,
+        "contracts": 21
+      },
+      "2023": {
+        "obligations": 8650003.2,
+        "contracts": 18
+      },
+      "2024": {
+        "obligations": 8218516.59,
+        "contracts": 16
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 22041246.43
+      },
+      {
+        "name": "Department of the Treasury",
+        "amount": 1531519.2
+      },
+      {
+        "name": "Department of Health and Human Services",
+        "amount": 760050.39
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 362472.0
+      }
+    ],
+    "unique_awardees": 10
+  },
+  "561499": {
+    "label": "Other Business Support Services",
+    "yearly": {
+      "2022": {
+        "obligations": 2331272.14,
+        "contracts": 9
+      },
+      "2023": {
+        "obligations": 2723277.57,
+        "contracts": 11
+      },
+      "2024": {
+        "obligations": 4001512.38,
+        "contracts": 17
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 3930824.93
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 3929816.52
+      },
+      {
+        "name": "Department of Health and Human Services",
+        "amount": 1195420.64
+      },
+      {
+        "name": "Environmental Protection Agency",
+        "amount": 0.0
+      }
+    ],
+    "unique_awardees": 9
+  },
+  "488190": {
+    "label": "Other Air Transportation Support",
+    "yearly": {
+      "2022": {
+        "obligations": 21443889.7,
+        "contracts": 47
+      },
+      "2023": {
+        "obligations": 18330953.03,
+        "contracts": 47
+      },
+      "2024": {
+        "obligations": 16064355.19,
+        "contracts": 46
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Defense",
+        "amount": 51488066.37
+      },
+      {
+        "name": "Department of Homeland Security",
+        "amount": 3391070.98
+      },
+      {
+        "name": "General Services Administration",
+        "amount": 1008505.04
+      },
+      {
+        "name": "Department of Justice",
+        "amount": -48444.47
+      }
+    ],
+    "unique_awardees": 26
+  },
+  "493110": {
+    "label": "General Warehousing & Storage",
+    "yearly": {
+      "2022": {
+        "obligations": 14372191.12,
+        "contracts": 9
+      },
+      "2023": {
+        "obligations": 14732093.6,
+        "contracts": 8
+      },
+      "2024": {
+        "obligations": 17109432.97,
+        "contracts": 8
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Defense",
+        "amount": 39671850.82
+      },
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 4426879.98
+      },
+      {
+        "name": "Environmental Protection Agency",
+        "amount": 2114986.89
+      }
+    ],
+    "unique_awardees": 12
+  },
+  "532490": {
+    "label": "Other Commercial Equipment Rental",
+    "yearly": {
+      "2022": {
+        "obligations": 4253860.41,
+        "contracts": 27
+      },
+      "2023": {
+        "obligations": 6078582.6,
+        "contracts": 37
+      },
+      "2024": {
+        "obligations": 12884686.93,
+        "contracts": 46
+      }
+    },
+    "top_agencies": [
+      {
+        "name": "Department of Veterans Affairs",
+        "amount": 16621746.72
+      },
+      {
+        "name": "Department of Defense",
+        "amount": 6557535.72
+      },
+      {
+        "name": "Department of Transportation",
+        "amount": 37847.5
+      }
+    ],
+    "unique_awardees": 39
+  }
+}
