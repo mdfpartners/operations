@@ -1,0 +1,245 @@
+{
+  "R706": {
+    "label": "Logistics Mgmt Support (BOS backbone)",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  },
+  "S201": {
+    "label": "Custodial/Janitorial Services",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  },
+  "J025": {
+    "label": "Vehicle Equipment Maint/Repair",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  },
+  "S216": {
+    "label": "Facilities Operations Support",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  },
+  "Z1AZ": {
+    "label": "Real Property Maintenance (Other)",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  },
+  "Z1AA": {
+    "label": "Real Property Maintenance (Office Bldgs)",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  },
+  "J059": {
+    "label": "HVAC Equipment Maintenance",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  },
+  "J041": {
+    "label": "Refrigeration Equipment Maint",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  },
+  "J045": {
+    "label": "Plumbing/Heating Equipment Maint",
+    "yearly": {
+      "2022": 7992407314.74,
+      "2023": 9078073394.62,
+      "2024": 8788590261.25
+    },
+    "total": 25859070970.61,
+    "count": 45690,
+    "avg": 565967.8479012913,
+    "growth": 9.961741377239866,
+    "awardees": "100+",
+    "agencies": [
+      [
+        "Department of Veterans Affairs",
+        19417205661.62
+      ],
+      [
+        "Department of Defense",
+        3475971981.61
+      ],
+      [
+        "Department of Homeland Security",
+        727563276.73
+      ]
+    ]
+  }
+}

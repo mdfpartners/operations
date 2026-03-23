@@ -1,0 +1,514 @@
+{
+  "psc_detail": {
+    "R706": {
+      "label": "SUPPORT- MANAGEMENT: LOGISTICS SUPPORT",
+      "yearly": {
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "total": 0.0,
+      "count": 0,
+      "avg": 0,
+      "growth": 0,
+      "agencies": [],
+      "awardees": 0
+    },
+    "S201": {
+      "label": "Custodial/Janitorial",
+      "yearly": {
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "total": 0.0,
+      "count": 0,
+      "avg": 0,
+      "growth": 0,
+      "agencies": [],
+      "awardees": 0
+    },
+    "J025": {
+      "label": "MAINT/REPAIR/REBUILD OF EQUIPMENT- VEHICULAR EQUIPMENT COMPONENTS",
+      "yearly": {
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "total": 0.0,
+      "count": 0,
+      "avg": 0,
+      "growth": 0,
+      "agencies": [],
+      "awardees": 0
+    },
+    "S216": {
+      "label": "HOUSEKEEPING- FACILITIES OPERATIONS SUPPORT",
+      "yearly": {
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "total": 0.0,
+      "count": 0,
+      "avg": 0,
+      "growth": 0,
+      "agencies": [],
+      "awardees": 0
+    },
+    "Z1AZ": {
+      "label": "Maintenance \u2014 Other Real Property",
+      "yearly": {
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "total": 0.0,
+      "count": 0,
+      "avg": 0,
+      "growth": 0,
+      "agencies": [],
+      "awardees": 0
+    },
+    "R499": {
+      "label": "SUPPORT- PROFESSIONAL: OTHER",
+      "yearly": {
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "total": 0.0,
+      "count": 0,
+      "avg": 0,
+      "growth": 0,
+      "agencies": [],
+      "awardees": 0
+    },
+    "Z1AA": {
+      "label": "Maintenance \u2014 Office Bldgs",
+      "yearly": {
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "total": 0.0,
+      "count": 0,
+      "avg": 0,
+      "growth": 0,
+      "agencies": [],
+      "awardees": 0
+    },
+    "J059": {
+      "label": "Maintenance \u2014 HVAC Equipment",
+      "yearly": {
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "total": 0.0,
+      "count": 0,
+      "avg": 0,
+      "growth": 0,
+      "agencies": [],
+      "awardees": 0
+    }
+  },
+  "award_sample_count": 50,
+  "desc_counts": {
+    "Energy Management": 1,
+    "Uncategorized/Other": 15,
+    "General Support Services": 4,
+    "General Maintenance": 11,
+    "Logistics Support": 4,
+    "Base Operations Support (BOS)": 2,
+    "Custodial/Janitorial": 7,
+    "Operations & Maintenance (O&M)": 5,
+    "Grounds Maintenance": 1
+  },
+  "new_naics_data": {
+    "238220": {
+      "yearly": {
+        "2022": {
+          "obligations": 104829191.73,
+          "contracts": 444
+        },
+        "2023": {
+          "obligations": 164248624.38,
+          "contracts": 437
+        },
+        "2024": {
+          "obligations": 157229832.12,
+          "contracts": 452
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 392097506.47
+        },
+        {
+          "name": "Department of Defense",
+          "amount": 20258315.4
+        },
+        {
+          "name": "Department of Transportation",
+          "amount": 11146027.53
+        },
+        {
+          "name": "Department of the Interior",
+          "amount": 1847662.33
+        },
+        {
+          "name": "Department of Agriculture",
+          "amount": 797503.58
+        }
+      ],
+      "unique_awardees": "200+",
+      "label": "Plumbing/HVAC Contractors"
+    },
+    "238210": {
+      "yearly": {
+        "2022": {
+          "obligations": 114364667.87,
+          "contracts": 213
+        },
+        "2023": {
+          "obligations": 85342824.12,
+          "contracts": 213
+        },
+        "2024": {
+          "obligations": 54886886.39,
+          "contracts": 210
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 231445627.82
+        },
+        {
+          "name": "Department of Defense",
+          "amount": 8988978.22
+        },
+        {
+          "name": "Social Security Administration",
+          "amount": 7219131.72
+        },
+        {
+          "name": "Department of Transportation",
+          "amount": 4126130.15
+        },
+        {
+          "name": "Department of the Interior",
+          "amount": 1122221.87
+        }
+      ],
+      "unique_awardees": "200+",
+      "label": "Electrical Contractors"
+    },
+    "238990": {
+      "yearly": {
+        "2022": {
+          "obligations": 19583941.32,
+          "contracts": 50
+        },
+        "2023": {
+          "obligations": 14093365.39,
+          "contracts": 49
+        },
+        "2024": {
+          "obligations": 18440131.5,
+          "contracts": 56
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 29710250.74
+        },
+        {
+          "name": "Department of Defense",
+          "amount": 11805919.44
+        },
+        {
+          "name": "Department of Transportation",
+          "amount": 5900286.43
+        },
+        {
+          "name": "Department of Agriculture",
+          "amount": 3376523.0
+        },
+        {
+          "name": "Department of the Interior",
+          "amount": 1504550.0
+        }
+      ],
+      "unique_awardees": 90,
+      "label": "Other Specialty Trade Contractors"
+    },
+    "236220": {
+      "yearly": {
+        "2022": {
+          "obligations": 2064213265.21,
+          "contracts": 1950
+        },
+        "2023": {
+          "obligations": 2244636754.06,
+          "contracts": 1932
+        },
+        "2024": {
+          "obligations": 2072829353.3,
+          "contracts": 1790
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 6098860617.12
+        },
+        {
+          "name": "Department of Defense",
+          "amount": 139307682.48
+        },
+        {
+          "name": "Department of Health and Human Services",
+          "amount": 60859728.86
+        },
+        {
+          "name": "General Services Administration",
+          "amount": 33708335.9
+        },
+        {
+          "name": "Department of Homeland Security",
+          "amount": 20901824.66
+        }
+      ],
+      "unique_awardees": "200+",
+      "label": "Commercial/Institutional Building Construction"
+    },
+    "811310": {
+      "yearly": {
+        "2022": {
+          "obligations": 10749477.64,
+          "contracts": 147
+        },
+        "2023": {
+          "obligations": 15545319.59,
+          "contracts": 158
+        },
+        "2024": {
+          "obligations": 19699273.59,
+          "contracts": 204
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 38823009.0
+        },
+        {
+          "name": "Department of Defense",
+          "amount": 6939029.5
+        },
+        {
+          "name": "Department of Commerce",
+          "amount": 178653.52
+        },
+        {
+          "name": "Department of Transportation",
+          "amount": 53378.8
+        }
+      ],
+      "unique_awardees": 164,
+      "label": "Commercial Machinery/Equip Repair & Maint"
+    },
+    "562910": {
+      "yearly": {
+        "2022": {
+          "obligations": 7809084.78,
+          "contracts": 45
+        },
+        "2023": {
+          "obligations": -88089.03,
+          "contracts": 49
+        },
+        "2024": {
+          "obligations": 4092000.83,
+          "contracts": 33
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 8172319.35
+        },
+        {
+          "name": "Department of the Interior",
+          "amount": 1853135.22
+        },
+        {
+          "name": "Department of Defense",
+          "amount": 1787542.01
+        },
+        {
+          "name": "Environmental Protection Agency",
+          "amount": 0.0
+        }
+      ],
+      "unique_awardees": 61,
+      "label": "Remediation Services"
+    },
+    "561990": {
+      "yearly": {
+        "2022": {
+          "obligations": 31812063.68,
+          "contracts": 152
+        },
+        "2023": {
+          "obligations": 42291212.16,
+          "contracts": 179
+        },
+        "2024": {
+          "obligations": 52031893.93,
+          "contracts": 174
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Defense",
+          "amount": 99094270.35
+        },
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 27011472.1
+        },
+        {
+          "name": "Agency for International Development",
+          "amount": 29427.32
+        }
+      ],
+      "unique_awardees": 61,
+      "label": "All Other Support Services"
+    },
+    "237310": {
+      "yearly": {
+        "2022": {
+          "obligations": 41066507.28,
+          "contracts": 39
+        },
+        "2023": {
+          "obligations": 22783367.56,
+          "contracts": 40
+        },
+        "2024": {
+          "obligations": 19723195.73,
+          "contracts": 45
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 58894252.41
+        },
+        {
+          "name": "Department of Defense",
+          "amount": 12535400.71
+        },
+        {
+          "name": "Department of Transportation",
+          "amount": 6573999.56
+        },
+        {
+          "name": "Department of the Interior",
+          "amount": 3524917.89
+        },
+        {
+          "name": "Department of Agriculture",
+          "amount": 2044500.0
+        }
+      ],
+      "unique_awardees": 72,
+      "label": "Highway, Street & Bridge Construction"
+    },
+    "541513": {
+      "yearly": {
+        "2022": {
+          "obligations": 52680023.84,
+          "contracts": 20
+        },
+        "2023": {
+          "obligations": 47941320.72,
+          "contracts": 23
+        },
+        "2024": {
+          "obligations": 53288386.65,
+          "contracts": 19
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Defense",
+          "amount": 129470738.13
+        },
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 14784293.9
+        },
+        {
+          "name": "National Aeronautics and Space Administration",
+          "amount": 8135086.63
+        },
+        {
+          "name": "Department of Transportation",
+          "amount": 1506131.57
+        },
+        {
+          "name": "Committee for Purchase from People Who Are Blind or Severely Disabled",
+          "amount": 86360.0
+        }
+      ],
+      "unique_awardees": 25,
+      "label": "Computer Facilities Mgmt Services"
+    },
+    "561621": {
+      "yearly": {
+        "2022": {
+          "obligations": 28513062.6,
+          "contracts": 162
+        },
+        "2023": {
+          "obligations": 26227903.95,
+          "contracts": 178
+        },
+        "2024": {
+          "obligations": 21045042.11,
+          "contracts": 177
+        }
+      },
+      "top_agencies": [
+        {
+          "name": "Department of Veterans Affairs",
+          "amount": 67440700.81
+        },
+        {
+          "name": "Department of Defense",
+          "amount": 5626942.22
+        },
+        {
+          "name": "Department of Homeland Security",
+          "amount": 1760258.72
+        },
+        {
+          "name": "Department of State",
+          "amount": 702277.12
+        },
+        {
+          "name": "General Services Administration",
+          "amount": 98725.87
+        }
+      ],
+      "unique_awardees": 109,
+      "label": "Security Systems Services (Except Locksmiths)"
+    }
+  }
+}
