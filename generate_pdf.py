@@ -128,7 +128,8 @@ html_content = """<!DOCTYPE html>
   <li>Strong written and spoken English &mdash; your Teams messages, status notes, and cold calls are clear and professional</li>
   <li>Comfortable on the phone &mdash; cold calling subcontractors requires confidence, brevity, and a professional tone</li>
   <li>Proactive communicator &mdash; you follow up without needing to be chased and surface problems before they become fires</li>
-  <li>Comfortable with Excel &mdash; you can maintain a structured project tracker and keep it accurate daily</li>
+  <li>Strong Excel skills &mdash; pivot tables, data analysis, and maintaining structured trackers accurately daily</li>
+  <li>Experience using AI tools to automate and accelerate work &mdash; Claude, Perplexity, Twilio, or similar platforms</li>
   <li>Reliable and consistent &mdash; this role runs on cadence; showing up on schedule matters</li>
   <li>Experience in operations coordination, virtual assistance, recruiting support, or project support preferred</li>
   <li>Facility services, staffing, or construction industry background a plus but not required</li>
@@ -142,6 +143,9 @@ html_content = """<!DOCTYPE html>
   <span class="tool">Phone / VOIP</span>
   <span class="tool">Indeed (recruiting)</span>
   <span class="tool">OrangeQC (read only)</span>
+  <span class="tool">Claude / AI tools</span>
+  <span class="tool">Perplexity</span>
+  <span class="tool">Twilio</span>
 </div>
 
 
