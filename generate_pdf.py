@@ -14,94 +14,109 @@ html_content = """<!DOCTYPE html>
       font-size: 10pt;
       margin: 0;
       padding: 0;
-      color: #17262f;
+      color: #1a1a1a;
       background: #ffffff;
     }
+    /* Header: full-width navy block, all white text */
     .header-bar {
       background-color: #121c22;
       color: #ffffff;
-      padding: 28px 40px 20px 40px;
-      text-align: center;
+      padding: 32px 48px 24px 48px;
     }
     .header-bar h1 {
-      font-size: 18pt;
-      margin: 0 0 4px 0;
-      letter-spacing: 2px;
+      font-size: 20pt;
+      margin: 0 0 2px 0;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
       color: #ffffff;
+      font-weight: 700;
     }
     .header-bar h2 {
-      font-size: 13pt;
-      margin: 0 0 10px 0;
-      font-weight: normal;
-      color: #bc3c23;
-      letter-spacing: 1px;
-    }
-    .header-bar .subtitle {
-      font-size: 9.5pt;
-      color: #abafb5;
+      font-size: 12pt;
+      margin: 0 0 12px 0;
+      font-weight: 400;
+      color: #d0d5d8;
       letter-spacing: 0.5px;
     }
-    .accent-bar {
+    .header-bar .subtitle {
+      font-size: 9pt;
+      color: #8a9198;
+      letter-spacing: 0.3px;
+    }
+    /* Thin navy rule below header — no red stripe */
+    .rule-top {
       background-color: #bc3c23;
-      height: 4px;
+      height: 3px;
     }
     .content {
-      padding: 24px 40px 16px 40px;
+      padding: 28px 48px 20px 48px;
     }
+    /* Section headings: dark navy, thin navy underline */
     h3 {
-      font-size: 10pt;
-      margin-top: 20px;
+      font-size: 9pt;
+      margin-top: 22px;
       margin-bottom: 6px;
       padding-bottom: 4px;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       color: #121c22;
-      border-bottom: 2px solid #bc3c23;
+      border-bottom: 1px solid #121c22;
+      font-weight: 700;
     }
-    p { margin: 6px 0; line-height: 1.55; color: #17262f; }
-    ul { margin: 6px 0 6px 20px; padding: 0; }
-    li { margin-bottom: 4px; line-height: 1.55; color: #17262f; }
+    p { margin: 6px 0; line-height: 1.6; color: #1a1a1a; }
+    ul { margin: 6px 0 6px 18px; padding: 0; }
+    li { margin-bottom: 5px; line-height: 1.6; color: #1a1a1a; }
+    /* Schedule table */
     table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 8.5pt; }
     th {
       background-color: #121c22;
       color: #ffffff;
-      padding: 7px 8px;
+      padding: 7px 10px;
       text-align: left;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-size: 8pt;
+      letter-spacing: 0.6px;
+      font-size: 7.5pt;
+      font-weight: 600;
     }
-    td { border: 1px solid #d4d7d9; padding: 5px 8px; vertical-align: top; color: #17262f; }
-    tr:nth-child(even) td { background-color: #f4f5f6; }
+    td {
+      border: 1px solid #dde0e2;
+      padding: 6px 10px;
+      vertical-align: top;
+      color: #1a1a1a;
+    }
+    tr:nth-child(even) td { background-color: #f7f8f9; }
+    /* Tool badges: light gray, dark text — readable and understated */
     .tools { margin-top: 8px; }
     .tool {
       display: inline-block;
-      background: #121c22;
-      color: #ffffff;
-      border-radius: 3px;
+      background: #eef0f2;
+      color: #121c22;
+      border: 1px solid #c8cdd0;
+      border-radius: 2px;
       padding: 3px 10px;
       font-size: 8.5pt;
       margin: 3px 4px 3px 0;
-      letter-spacing: 0.3px;
+      font-weight: 600;
     }
+    /* Escalation: subtle navy left border, light gray background */
     .escalation-box {
-      background: #fff5f4;
-      border-left: 4px solid #bc3c23;
+      background: #f4f5f6;
+      border-left: 3px solid #121c22;
       padding: 10px 14px;
       margin-top: 8px;
       font-size: 9.5pt;
-      line-height: 1.55;
+      line-height: 1.6;
+      color: #1a1a1a;
     }
+    /* Footer: navy band, muted text */
     .footer {
       background-color: #121c22;
-      color: #abafb5;
+      color: #8a9198;
       text-align: center;
       font-size: 8.5pt;
-      padding: 12px 40px;
-      margin-top: 24px;
+      padding: 14px 48px;
+      margin-top: 28px;
     }
-    .footer span { color: #bc3c23; }
   </style>
 </head>
 <body>
@@ -111,7 +126,7 @@ html_content = """<!DOCTYPE html>
   <h2>Operations Coordinator (PMO)</h2>
   <div class="subtitle">Part-time contractor &middot; 8&ndash;10 hrs/week &middot; Mon&ndash;Thu &middot; LATAM-based &middot; Remote &middot; $10&ndash;12/hr</div>
 </div>
-<div class="accent-bar"></div>
+<div class="rule-top"></div>
 
 <div class="content">
 
@@ -230,7 +245,7 @@ html_content = """<!DOCTYPE html>
 </div><!-- /content -->
 
 <div class="footer">
-  Mad Dog Facility Partners &middot; <span>maddogcleaning.com</span> &middot; 309.966.0060 &middot; office@maddogcleaning.com
+  Mad Dog Facility Partners &middot; maddogcleaning.com &middot; 309.966.0060 &middot; office@maddogcleaning.com
 </div>
 
 </body>
