@@ -124,7 +124,7 @@ html_content = """<!DOCTYPE html>
 <div class="header-bar">
   <h1>Mad Dog Facility Partners</h1>
   <h2>Operations Coordinator (PMO)</h2>
-  <div class="subtitle">Part-time contractor &middot; 8&ndash;10 hrs/week &middot; Mon&ndash;Thu &middot; LATAM-based &middot; Remote &middot; $10&ndash;12/hr</div>
+  <div class="subtitle">Part-time contractor &middot; 8&ndash;10 hrs/week &middot; Mon&ndash;Thu &middot; Remote &middot; $10&ndash;12/hr</div>
 </div>
 <div class="rule-top"></div>
 
@@ -136,7 +136,7 @@ html_content = """<!DOCTYPE html>
 
 <h3>Role Overview</h3>
 <p>The Operations Coordinator is the operational backbone of the MDF team. You will own our daily project tracker &mdash; logging status updates, adding new adhoc items as they arise, and keeping every active initiative current so leadership always knows exactly where things stand. You will run accountability follow-up after our morning standups, manage our candidate and subcontractor bench pipelines, support the initial phase of recruiting, and step in wherever the team needs a hand to keep things moving.</p>
-<p>You do not make strategic decisions &mdash; you make sure the people who do never have to ask &ldquo;where does this stand&rdquo; on anything. This role reports directly to the CEO and works alongside our operations lead, HR coordinator, and LATAM support team.</p>
+<p>You do not make strategic decisions &mdash; you make sure the people who do never have to ask &ldquo;where does this stand&rdquo; on anything. This role reports directly to the CEO and works alongside our operations lead, HR coordinator, and support team.</p>
 
 <h3>Core Responsibilities</h3>
 <ul>
