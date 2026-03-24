@@ -66,25 +66,6 @@ html_content = """<!DOCTYPE html>
     p { margin: 6px 0; line-height: 1.6; color: #1a1a1a; }
     ul { margin: 6px 0 6px 18px; padding: 0; }
     li { margin-bottom: 5px; line-height: 1.6; color: #1a1a1a; }
-    /* Schedule table */
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 8.5pt; }
-    th {
-      background-color: #121c22;
-      color: #ffffff;
-      padding: 7px 10px;
-      text-align: left;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      font-size: 7.5pt;
-      font-weight: 600;
-    }
-    td {
-      border: 1px solid #dde0e2;
-      padding: 6px 10px;
-      vertical-align: top;
-      color: #1a1a1a;
-    }
-    tr:nth-child(even) td { background-color: #f7f8f9; }
     /* Tool badges: light gray, dark text — readable and understated */
     .tools { margin-top: 8px; }
     .tool {
@@ -97,16 +78,6 @@ html_content = """<!DOCTYPE html>
       font-size: 8.5pt;
       margin: 3px 4px 3px 0;
       font-weight: 600;
-    }
-    /* Escalation: subtle navy left border, light gray background */
-    .escalation-box {
-      background: #f4f5f6;
-      border-left: 3px solid #121c22;
-      padding: 10px 14px;
-      margin-top: 8px;
-      font-size: 9.5pt;
-      line-height: 1.6;
-      color: #1a1a1a;
     }
     /* Footer: navy band, muted text */
     .footer {
@@ -151,70 +122,6 @@ html_content = """<!DOCTYPE html>
   <li>Offer hands-on support wherever the team is lagging &mdash; step in on open tasks, follow up on outstanding items, and proactively identify where things need attention before being asked</li>
 </ul>
 
-<h3>Expected Weekly Schedule</h3>
-<table>
-  <tr>
-    <th>Day</th>
-    <th>Task</th>
-    <th>Time</th>
-    <th>Details</th>
-  </tr>
-  <tr>
-    <td>Monday</td>
-    <td>Standup log + tracker reset</td>
-    <td>45 min</td>
-    <td>Attend standup, log commitments, reset weekly checklist for new week, prepare Monday dashboard view for standup</td>
-  </tr>
-  <tr>
-    <td>Monday</td>
-    <td>Project tracker review</td>
-    <td>30 min</td>
-    <td>Review all active adhoc initiatives, add date-stamped status note to any row not updated in 3+ days, add new items as directed</td>
-  </tr>
-  <tr>
-    <td>Tuesday</td>
-    <td>Standup log + follow-up nudges</td>
-    <td>45 min</td>
-    <td>Log standup commitments, follow up on Yellow/Red items from Monday via Teams, escalate unresolved items to CEO</td>
-  </tr>
-  <tr>
-    <td>Tuesday</td>
-    <td>Bench pipeline check-ins</td>
-    <td>45 min</td>
-    <td>Contact candidates and subs due for 4&ndash;6 week check-in; update bench tracker with current availability and interest status</td>
-  </tr>
-  <tr>
-    <td>Wednesday</td>
-    <td>Standup log + tracker update</td>
-    <td>45 min</td>
-    <td>Log standup, update project tracker with new developments, add any new adhoc items surfaced by team or CEO</td>
-  </tr>
-  <tr>
-    <td>Wednesday</td>
-    <td>Subcontractor cold outreach</td>
-    <td>30 min</td>
-    <td>Cold call prospective subcontractors in priority markets; qualify availability and capabilities; log results and add qualified subs to bench tracker</td>
-  </tr>
-  <tr>
-    <td>Wednesday</td>
-    <td>Recruiting support</td>
-    <td>30 min</td>
-    <td>Review new applicants, conduct first-touch outreach to qualified candidates, schedule first-round interviews for HR coordinator</td>
-  </tr>
-  <tr>
-    <td>Thursday</td>
-    <td>Standup log + accountability review</td>
-    <td>45 min</td>
-    <td>Log standup, review full weekly checklist for missed items, log to Accountability Log, flag to CEO via Teams</td>
-  </tr>
-  <tr>
-    <td>Thursday</td>
-    <td>Friday standup prep + general support</td>
-    <td>30 min</td>
-    <td>Compile week completion rate, pull Red/Yellow flags, update dashboard for Friday standup; use remaining time to offer support on any lagging open items across the team</td>
-  </tr>
-</table>
-
 <h3>What We&rsquo;re Looking For</h3>
 <ul>
   <li>Exceptionally organized &mdash; you track details without being asked twice</li>
@@ -237,10 +144,6 @@ html_content = """<!DOCTYPE html>
   <span class="tool">OrangeQC (read only)</span>
 </div>
 
-<h3>Escalation Protocol</h3>
-<div class="escalation-box">
-  When a task goes Red &mdash; missed deadline, no response after two nudges, or a blocker with no owner &mdash; send a direct Teams message to the CEO immediately with the task name, owner, and last known status. Do not wait for the next standup. Same-day escalation is expected.
-</div>
 
 </div><!-- /content -->
 
