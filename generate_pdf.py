@@ -124,7 +124,7 @@ html_content = """<!DOCTYPE html>
 <div class="header-bar">
   <h1>Mad Dog Facility Partners</h1>
   <h2>Operations Coordinator (PMO)</h2>
-  <div class="subtitle">Part-time contractor &middot; 8&ndash;10 hrs/week &middot; Mon&ndash;Thu &middot; Remote &middot; $10&ndash;12/hr</div>
+  <div class="subtitle">Part-time contractor &middot; 8&ndash;10 hrs/week &middot; Mon&ndash;Thu &middot; Remote &middot; $400/mo</div>
 </div>
 <div class="rule-top"></div>
 
