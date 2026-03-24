@@ -8,28 +8,112 @@ html_content = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <style>
-    body { font-family: Arial, sans-serif; font-size: 10pt; margin: 40px; color: #222; }
-    h1 { font-size: 16pt; text-align: center; margin-bottom: 2px; letter-spacing: 1px; }
-    h2 { font-size: 12pt; text-align: center; margin-top: 2px; margin-bottom: 4px; font-weight: normal; }
-    .subtitle { text-align: center; font-size: 10pt; margin-bottom: 16px; color: #444; }
-    h3 { font-size: 11pt; margin-top: 18px; margin-bottom: 6px; border-bottom: 1px solid #aaa; padding-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-    p { margin: 6px 0; line-height: 1.5; }
+    @page { margin: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 10pt;
+      margin: 0;
+      padding: 0;
+      color: #17262f;
+      background: #ffffff;
+    }
+    .header-bar {
+      background-color: #121c22;
+      color: #ffffff;
+      padding: 28px 40px 20px 40px;
+      text-align: center;
+    }
+    .header-bar h1 {
+      font-size: 18pt;
+      margin: 0 0 4px 0;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+    .header-bar h2 {
+      font-size: 13pt;
+      margin: 0 0 10px 0;
+      font-weight: normal;
+      color: #bc3c23;
+      letter-spacing: 1px;
+    }
+    .header-bar .subtitle {
+      font-size: 9.5pt;
+      color: #abafb5;
+      letter-spacing: 0.5px;
+    }
+    .accent-bar {
+      background-color: #bc3c23;
+      height: 4px;
+    }
+    .content {
+      padding: 24px 40px 16px 40px;
+    }
+    h3 {
+      font-size: 10pt;
+      margin-top: 20px;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #121c22;
+      border-bottom: 2px solid #bc3c23;
+    }
+    p { margin: 6px 0; line-height: 1.55; color: #17262f; }
     ul { margin: 6px 0 6px 20px; padding: 0; }
-    li { margin-bottom: 4px; line-height: 1.5; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 9pt; }
-    th { background-color: #1a1a2e; color: #fff; padding: 6px 8px; text-align: left; }
-    td { border: 1px solid #ccc; padding: 5px 8px; vertical-align: top; }
-    tr:nth-child(even) td { background-color: #f5f5f5; }
-    .tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-    .tool { background: #e8e8e8; border-radius: 4px; padding: 3px 10px; font-size: 9pt; }
-    .footer { margin-top: 24px; text-align: center; font-size: 9pt; color: #555; border-top: 1px solid #ccc; padding-top: 8px; }
+    li { margin-bottom: 4px; line-height: 1.55; color: #17262f; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 8.5pt; }
+    th {
+      background-color: #121c22;
+      color: #ffffff;
+      padding: 7px 8px;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 8pt;
+    }
+    td { border: 1px solid #d4d7d9; padding: 5px 8px; vertical-align: top; color: #17262f; }
+    tr:nth-child(even) td { background-color: #f4f5f6; }
+    .tools { margin-top: 8px; }
+    .tool {
+      display: inline-block;
+      background: #121c22;
+      color: #ffffff;
+      border-radius: 3px;
+      padding: 3px 10px;
+      font-size: 8.5pt;
+      margin: 3px 4px 3px 0;
+      letter-spacing: 0.3px;
+    }
+    .escalation-box {
+      background: #fff5f4;
+      border-left: 4px solid #bc3c23;
+      padding: 10px 14px;
+      margin-top: 8px;
+      font-size: 9.5pt;
+      line-height: 1.55;
+    }
+    .footer {
+      background-color: #121c22;
+      color: #abafb5;
+      text-align: center;
+      font-size: 8.5pt;
+      padding: 12px 40px;
+      margin-top: 24px;
+    }
+    .footer span { color: #bc3c23; }
   </style>
 </head>
 <body>
 
-<h1>MAD DOG FACILITY PARTNERS &mdash; REMOTE POSITION</h1>
-<h2>Operations Coordinator (PMO)</h2>
-<div class="subtitle">Part-time contractor &middot; 8&ndash;10 hrs/week &middot; Mon&ndash;Thu &middot; LATAM-based &middot; Remote &middot; $10&ndash;12/hr</div>
+<div class="header-bar">
+  <h1>Mad Dog Facility Partners</h1>
+  <h2>Operations Coordinator (PMO)</h2>
+  <div class="subtitle">Part-time contractor &middot; 8&ndash;10 hrs/week &middot; Mon&ndash;Thu &middot; LATAM-based &middot; Remote &middot; $10&ndash;12/hr</div>
+</div>
+<div class="accent-bar"></div>
+
+<div class="content">
 
 <h3>About Mad Dog Facility Partners</h3>
 <p>Mad Dog Facility Partners (MDF) is a service-disabled veteran-owned small business providing janitorial and security staffing services to government, industrial, and correctional facilities across the Phoenix metro area and Midwest. We are a family-owned company with over 20 years of history in Central Illinois and a culture built on reliability, accountability, and people-first leadership.</p>
@@ -139,11 +223,14 @@ html_content = """<!DOCTYPE html>
 </div>
 
 <h3>Escalation Protocol</h3>
-<p>When a task goes Red &mdash; missed deadline, no response after two nudges, or a blocker with no owner &mdash; send a direct Teams message to the CEO immediately with the task name, owner, and last known status. Do not wait for the next standup. Same-day escalation is expected.</p>
+<div class="escalation-box">
+  When a task goes Red &mdash; missed deadline, no response after two nudges, or a blocker with no owner &mdash; send a direct Teams message to the CEO immediately with the task name, owner, and last known status. Do not wait for the next standup. Same-day escalation is expected.
+</div>
+
+</div><!-- /content -->
 
 <div class="footer">
-  Mad Dog Facility Partners &middot; maddogcleaning.com &middot; 309.966.0060<br>
-  To apply: office@maddogcleaning.com
+  Mad Dog Facility Partners &middot; <span>maddogcleaning.com</span> &middot; 309.966.0060 &middot; office@maddogcleaning.com
 </div>
 
 </body>
