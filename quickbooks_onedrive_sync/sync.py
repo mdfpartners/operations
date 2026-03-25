@@ -9,6 +9,9 @@ python sync.py
 # Pull the last N days
 python sync.py --days 7
 
+# Pull the last N days through today (inclusive)
+python sync.py --days 7 --include-today
+
 # Dry-run: print rows without writing to OneDrive
 python sync.py --dry-run
 
@@ -51,6 +54,11 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=int(os.environ.get("DEFAULT_DAYS_BACK", "1")),
         help="Number of days back to pull (default: 1 = yesterday)",
+    )
+    p.add_argument(
+        "--include-today",
+        action="store_true",
+        help="Extend the date range through today (default: end at yesterday)",
     )
     p.add_argument(
         "--file",
@@ -96,6 +104,8 @@ def main() -> None:
 
     # ── 1. Build date range ────────────────────────────────────────────────
     start, end = date_range_for_days_back(args.days)
+    if args.include_today:
+        end = date.today()
     print(f"[sync] Pulling QuickBooks Time from {start} to {end} …")
 
     # ── 2. Fetch timesheets ────────────────────────────────────────────────
