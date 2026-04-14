@@ -1,0 +1,43 @@
+{
+  "indeed": {
+    "email": "your-indeed-employer-email@example.com",
+    "password": "your-indeed-employer-password",
+    "employer_name": "Mad Dog Facility Partners",
+    "headless": true,
+    "slow_mo": 500,
+    "screenshot_dir": "screenshots"
+  },
+  "google": {
+    "form_link": "https://forms.gle/YOUR_FORM_ID",
+    "sheet_id": "YOUR_GOOGLE_SHEET_ID_HERE",
+    "credentials_file": "credentials/google_credentials.json",
+    "token_file": "credentials/token_sheets.pickle",
+    "form_columns": {
+      "timestamp": "Timestamp",
+      "email": "Email Address",
+      "full_name": "Full Name",
+      "phone": "Phone Number",
+      "position": "Position Applying For",
+      "experience": "Describe your relevant experience",
+      "felony_question": "Have you been convicted of a felony in the past 7 years?",
+      "felony_details": "If yes, please provide details"
+    }
+  },
+  "gmail": {
+    "recruiting_address": "recruiting@yourdomain.com",
+    "report_recipient": "owner@yourdomain.com",
+    "credentials_file": "credentials/gmail_credentials.json",
+    "token_file": "credentials/token_gmail.pickle"
+  },
+  "anthropic": {
+    "api_key": "sk-ant-YOUR_API_KEY_HERE",
+    "model": "claude-opus-4-6"
+  },
+  "company": {
+    "name": "Mad Dog Facility Partners",
+    "tagline": "a veteran-owned janitorial and facility services company"
+  },
+  "timezone": "America/Phoenix",
+  "log_file": "jenny_log.json",
+  "reminder_hours": 48
+}
