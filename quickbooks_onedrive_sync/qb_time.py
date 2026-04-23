@@ -11,6 +11,7 @@ Set QBT_ACCESS_TOKEN in .env with the full token value.
 from __future__ import annotations
 
 import os
+import time
 from datetime import date, timedelta
 from typing import Any
 
@@ -27,7 +28,13 @@ class QBTimeClient:
     # ── low-level ──────────────────────────────────────────────────────────
 
     def _get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict:
-        resp = self._session.get(f"{_BASE}/{endpoint}", params=params)
+        url = f"{_BASE}/{endpoint}"
+        for attempt, delay in enumerate([0, 4, 8, 16]):
+            if delay:
+                time.sleep(delay)
+            resp = self._session.get(url, params=params)
+            if resp.status_code != 503:
+                break
         resp.raise_for_status()
         return resp.json()
 

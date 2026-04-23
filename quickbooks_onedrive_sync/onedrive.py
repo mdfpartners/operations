@@ -12,6 +12,7 @@ Graph API docs: https://learn.microsoft.com/en-us/graph/api/resources/excel
 from __future__ import annotations
 
 import os
+import time
 import urllib.parse
 from typing import Any
 
@@ -36,11 +37,19 @@ class OneDriveClient:
         tenant_id = tenant_id or os.environ["AZURE_TENANT_ID"]
 
         authority = f"https://login.microsoftonline.com/{tenant_id}"
-        self._app = msal.ConfidentialClientApplication(
-            client_id,
-            authority=authority,
-            client_credential=client_secret,
-        )
+        for delay in [0, 4, 8, 16]:
+            if delay:
+                time.sleep(delay)
+            try:
+                self._app = msal.ConfidentialClientApplication(
+                    client_id,
+                    authority=authority,
+                    client_credential=client_secret,
+                )
+                break
+            except Exception as exc:
+                if "503" not in str(exc) or delay == 16:
+                    raise
         self._session = build_session()
         self._refresh_token()
 
@@ -58,35 +67,36 @@ class OneDriveClient:
 
     # ── low-level helpers ──────────────────────────────────────────────────
 
+    def _request(self, method: str, url: str, **kwargs: Any):
+        fn = getattr(self._session, method)
+        for delay in [0, 4, 8, 16]:
+            if delay:
+                time.sleep(delay)
+            resp = fn(url, **kwargs)
+            if resp.status_code == 401:
+                self._refresh_token()
+                resp = fn(url, **kwargs)
+            if resp.status_code != 503:
+                break
+        return resp
+
     def _get(self, url: str, **kwargs: Any) -> dict:
-        resp = self._session.get(url, **kwargs)
-        if resp.status_code == 401:
-            self._refresh_token()
-            resp = self._session.get(url, **kwargs)
+        resp = self._request("get", url, **kwargs)
         resp.raise_for_status()
         return resp.json()
 
     def _post(self, url: str, **kwargs: Any) -> dict:
-        resp = self._session.post(url, **kwargs)
-        if resp.status_code == 401:
-            self._refresh_token()
-            resp = self._session.post(url, **kwargs)
+        resp = self._request("post", url, **kwargs)
         resp.raise_for_status()
         return resp.json()
 
     def _patch(self, url: str, **kwargs: Any) -> dict:
-        resp = self._session.patch(url, **kwargs)
-        if resp.status_code == 401:
-            self._refresh_token()
-            resp = self._session.patch(url, **kwargs)
+        resp = self._request("patch", url, **kwargs)
         resp.raise_for_status()
         return resp.json()
 
     def _delete(self, url: str, **kwargs: Any) -> None:
-        resp = self._session.delete(url, **kwargs)
-        if resp.status_code == 401:
-            self._refresh_token()
-            resp = self._session.delete(url, **kwargs)
+        resp = self._request("delete", url, **kwargs)
         resp.raise_for_status()
 
     # ── file lookup ────────────────────────────────────────────────────────
