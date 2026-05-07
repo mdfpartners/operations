@@ -336,11 +336,23 @@ def build_monthly_variance(
 
 # ── main entry point ──────────────────────────────────────────────────────────
 
-def rebuild_summaries(od: OneDriveClient, user_id: str, item_id: str) -> None:
-    """Recompute and overwrite every summary tab from Raw Data."""
+def rebuild_summaries(
+    od: OneDriveClient,
+    user_id: str,
+    item_id: str,
+    rows: list[dict] | None = None,
+) -> None:
+    """Recompute and overwrite every summary tab from Raw Data.
 
-    print("[summaries] Reading Raw Data …")
-    rows = read_raw_data(od, user_id, item_id)
+    If *rows* is supplied the Raw Data sheet is not re-read (avoids a stale
+    Graph API response immediately after a write).
+    """
+
+    if rows is None:
+        print("[summaries] Reading Raw Data …")
+        rows = read_raw_data(od, user_id, item_id)
+    else:
+        print(f"[summaries] Using {len(rows)} in-memory rows.")
     if not rows:
         print("[summaries] Raw Data is empty – skipping summary rebuild.")
         return

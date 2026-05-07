@@ -38,7 +38,7 @@ from dotenv import load_dotenv
 
 from qb_time import QBTimeClient, date_range_for_days_back
 from onedrive import OneDriveClient
-from summaries import rebuild_summaries
+from summaries import rebuild_summaries, _d
 
 # Column layout — must match the Raw Data sheet exactly
 HEADER = ["Date", "Customer", "Employee", "Hours"]
@@ -88,6 +88,21 @@ def parse_args() -> argparse.Namespace:
         help="Write all rows even if the date is already present",
     )
     return p.parse_args()
+
+
+def _parse_for_summaries(raw_rows: list[list]) -> list[dict]:
+    """Convert raw sheet rows [[date, customer, employee, hours], …] to summary dicts."""
+    result = []
+    for row in raw_rows:
+        if not row or not row[0]:
+            continue
+        result.append({
+            "date":    _d(row[0]).isoformat(),
+            "jobcode": str(row[1]).strip() if len(row) > 1 and row[1] else "",
+            "user":    str(row[2]).strip() if len(row) > 2 and row[2] else "",
+            "hours":   float(row[3]) if len(row) > 3 and row[3] != "" else 0.0,
+        })
+    return result
 
 
 def rows_to_table(timesheets: list[dict]) -> list[list]:
@@ -147,37 +162,51 @@ def main() -> None:
     # ── 4. Ensure the worksheet exists ────────────────────────────────────
     od.ensure_worksheet(user_id, item_id, SHEET_NAME)
 
-    # ── 5. Optionally skip dates already in the sheet ─────────────────────
+    # ── 5. Read existing sheet once (used for dedup check AND summaries) ──
+    used = od.get_used_range(user_id, item_id, SHEET_NAME)
+    existing_sheet = used.get("values", [])
+    existing_data  = existing_sheet[1:] if len(existing_sheet) > 1 else []
+
     rows = rows_to_table(timesheets)
 
     if args.skip_duplicates:
-        unique_dates = list({row[0] for row in rows})
-        already_present: set[str] = set()
-        for d in unique_dates:
-            hits = od.find_rows_by_date(user_id, item_id, SHEET_NAME, d)
-            if hits:
-                already_present.add(d)
-
-        if already_present:
-            before = len(rows)
-            rows = [r for r in rows if r[0] not in already_present]
-            skipped = before - len(rows)
+        existing_dates: set[str] = set()
+        for r in existing_data:
+            if r and r[0]:
+                try:
+                    existing_dates.add(_d(r[0]).isoformat())
+                except (ValueError, TypeError):
+                    pass
+        before = len(rows)
+        new_rows = [r for r in rows if r[0] not in existing_dates]
+        skipped = before - len(new_rows)
+        if skipped:
+            already_present = sorted({r[0] for r in rows if r[0] in existing_dates})
             print(
                 f"[sync] Skipping {skipped} rows for dates already in spreadsheet: "
-                + ", ".join(sorted(already_present))
+                + ", ".join(already_present)
             )
+        rows = new_rows
 
     if not rows:
         print("[sync] All entries already present. Nothing new to write.")
+        # Still rebuild summaries in case a previous run left them stale
+        parsed = _parse_for_summaries(existing_data)
+        rebuild_summaries(od, user_id, item_id, rows=parsed)
         return
 
     # ── 6. Append rows ────────────────────────────────────────────────────
     print(f"[sync] Appending {len(rows)} rows to '{SHEET_NAME}' …")
-    start_row = od.append_rows(user_id, item_id, SHEET_NAME, rows, header=HEADER)
-    print(f"[sync] Done. Wrote rows starting at row {start_row}.")
+    next_row = len(existing_data) + 2 if existing_data else 2  # +1 for header, +1 for 1-based
+    if not existing_data:
+        od.update_range(user_id, item_id, SHEET_NAME, "A1", [HEADER])
+    od.update_range(user_id, item_id, SHEET_NAME, f"A{next_row}", rows)
+    print(f"[sync] Done. Wrote rows starting at row {next_row}.")
 
-    # ── 7. Rebuild all summary tabs from Raw Data ─────────────────────────
-    rebuild_summaries(od, user_id, item_id)
+    # ── 7. Rebuild summaries from in-memory data (no second Graph read) ───
+    all_data = existing_data + rows
+    parsed = _parse_for_summaries(all_data)
+    rebuild_summaries(od, user_id, item_id, rows=parsed)
 
 
 if __name__ == "__main__":
