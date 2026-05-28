@@ -1,511 +1,870 @@
 const PptxGenJS = require('pptxgenjs');
 const fs = require('fs');
 
-// ─── CONSTANTS ───────────────────────────────────────────────────────────────
-const NAVY   = '0D1F3C';
-const WHITE  = 'FFFFFF';
-const MGRAY  = '6B7280';
-const LGRAY  = '9CA3AF';
-const RULE   = 'D1D5DB';
-const GOLD   = 'C9A84C';
+// ─── COLOR CONSTANTS (no # prefix — pptxgenjs bug) ────────────────────────────
+const NAVY    = '0D1F3C';
+const WHITE   = 'FFFFFF';
+const MGRAY   = '6B7280';
+const LGRAY   = '9CA3AF';
+const RULE    = 'D1D5DB';
+const GOLD    = 'C9A84C';
 const PROSPECT = '1B3A6B';
-const GREEN  = '2E7D52';
-const DKGRAY = '374151';
-const ORANGE = 'F97316';  // OrangeQC brand accent
+const GREEN   = '2E7D52';
+const DKGRAY  = '374151';
+const BAND_W  = 'F4F7FB';
+const BAND_M  = 'F8F9FA';
 
-const SLIDE_W = 10;
-const SLIDE_H = 5.625;
+// ─── LAYOUT CONSTANTS ────────────────────────────────────────────────────────
+const SW     = 10.0;    // slide width
+const SH     = 5.625;   // slide height
+const LM     = 0.5;     // left margin
+const RM     = 9.6;     // right content edge
+const CW     = RM - LM; // 9.1" usable width
+const CT_TOP = 1.08;    // content top (below header/overline/headline)
+const CT_BOT = 5.08;    // content bottom (above footer logo)
+const CT_H   = CT_BOT - CT_TOP; // 4.0" usable content height
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
-function addContentChrome(slide, prs, pageNum, overline) {
-  slide.addShape(prs.ShapeType.rect, { x: 0, y: 0, w: SLIDE_W, h: 0.04, fill: { color: NAVY }, line: { color: NAVY } });
+// ─── LAYOUT VALIDATOR ────────────────────────────────────────────────────────
+function validateSlide(slideName, elements) {
+  let maxBottom = 0;
+  elements.forEach(el => {
+    const bottom = el.y + el.h;
+    if (bottom > SH) console.error(`  OVERFLOW [${slideName}] "${el.name}" extends to ${bottom.toFixed(2)}"`);
+    if (bottom > maxBottom) maxBottom = bottom;
+  });
+  const dead = CT_BOT - maxBottom;
+  if (dead > 0.35) console.warn(`  DEAD SPACE [${slideName}] ${dead.toFixed(2)}" unused — expand content`);
+  return maxBottom;
+}
+
+// ─── CHROME (every content slide) ────────────────────────────────────────────
+function addChrome(s, prs, pageNum, overline) {
+  // Top navy rule
+  s.addShape(prs.ShapeType.rect, { x: 0, y: 0, w: SW, h: 0.04, fill: { color: NAVY }, line: { color: NAVY } });
+  // Overline
   if (overline) {
-    slide.addText(overline, { x: 0.5, y: 0.10, w: 8, h: 0.18, fontSize: 7, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 3.5 });
+    s.addText(overline, {
+      x: LM, y: 0.10, w: 7.5, h: 0.18,
+      fontSize: 7, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 3.5
+    });
   }
-  slide.addText(String(pageNum), { x: 9.5, y: 0.08, w: 0.4, h: 0.18, fontSize: 8, color: LGRAY, fontFace: 'Calibri', align: 'right' });
-  slide.addImage({ path: './mdf_logo_white_bg.png', x: 8.72, y: 5.10, w: 1.15, h: 0.44 });
+  // Page number top-right
+  s.addText(String(pageNum), {
+    x: 9.4, y: 0.08, w: 0.5, h: 0.18,
+    fontSize: 8, color: LGRAY, fontFace: 'Calibri', align: 'right'
+  });
+  // MDF logo bottom-right
+  s.addImage({ path: './mdf_logo_white_bg.png', x: 8.68, y: 5.06, w: 1.18, h: 0.45 });
 }
 
-function hairline(slide, x, y, w, color) {
-  slide.addShape('rect', { x, y, w, h: 0.018, fill: { color: color || RULE }, line: { color: color || RULE } });
+// ─── SHAPE HELPERS ───────────────────────────────────────────────────────────
+function hl(s, x, y, w, color) {
+  s.addShape('rect', { x, y, w, h: 0.018, fill: { color: color || RULE }, line: { color: color || RULE } });
 }
-
-function vline(slide, x, y, h, color) {
-  slide.addShape('rect', { x, y, w: 0.018, h, fill: { color: color || RULE }, line: { color: color || RULE } });
+function vl(s, x, y, h, color) {
+  s.addShape('rect', { x, y, w: 0.018, h, fill: { color: color || RULE }, line: { color: color || RULE } });
 }
 
 // ─── BUILD ────────────────────────────────────────────────────────────────────
-async function buildProposal() {
+async function build() {
   const prs = new PptxGenJS();
   prs.layout = 'LAYOUT_WIDE';
-  prs.title = 'MDF Facility Services Proposal — Logical Systems';
 
-  // ── SLIDE 1: COVER ──────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 1 — COVER
+  // Layout: full-bleed background via s.background, text anchored bottom-left
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
-    s.addImage({ path: './cover_photo.jpg', x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
+    // CORRECTION 6: must use s.background, never addImage for cover
+    s.background = { path: './cover_photo.jpg' };
 
-    // All-white MDF logo top-left (white text, transparent bg, reads on dark photo)
-    s.addImage({ path: './mdf_logo_all_white.png', x: 0.38, y: 0.30, w: 1.10, h: 0.65 });
+    // MDF logo top-left — all-white version reads against dark photo
+    s.addImage({ path: './mdf_logo_all_white.png', x: 0.38, y: 0.28, w: 1.15, h: 0.68 });
 
+    // Bottom-left text block
     s.addText('PREPARED FOR', {
-      x: 0.5, y: 3.55, w: 6, h: 0.20,
+      x: LM, y: 3.45, w: 7, h: 0.20,
       fontSize: 7, bold: true, color: 'A8B8CC', fontFace: 'Calibri', charSpacing: 3.5
     });
     s.addText('Logical Systems Inc.', {
-      x: 0.5, y: 3.76, w: 8, h: 0.82,
-      fontSize: 34, bold: true, color: WHITE, fontFace: 'Trebuchet MS'
+      x: LM, y: 3.66, w: 8.5, h: 0.90,
+      fontSize: 36, bold: true, color: WHITE, fontFace: 'Trebuchet MS'
     });
-    s.addShape('rect', { x: 0.5, y: 4.58, w: 7.0, h: 0.018, fill: { color: '5A6A7A' }, line: { color: '5A6A7A' } });
+    s.addShape('rect', {
+      x: LM, y: 4.58, w: 7.2, h: 0.018,
+      fill: { color: '5A6A7A' }, line: { color: '5A6A7A' }
+    });
     s.addText('Facility Services Proposal  ·  April Bocox, Health and Safety Coordinator  ·  May 28, 2026', {
-      x: 0.5, y: 4.62, w: 9, h: 0.22,
-      fontSize: 9, color: '8B9BAD', fontFace: 'Calibri'
+      x: LM, y: 4.64, w: 9.2, h: 0.24,
+      fontSize: 9.5, color: '8B9BAD', fontFace: 'Calibri'
     });
   }
 
-  // ── SLIDE 2: WHY MDF ────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 2 — WHY MDF
+  // Layout: three equal columns with vertical hairline rules, stats as hero
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
     s.background = { color: WHITE };
-    addContentChrome(s, prs, 2, 'WHY MAD DOG FACILITY PARTNERS');
+    addChrome(s, prs, 2, 'WHY MAD DOG FACILITY PARTNERS');
 
     s.addText('You can choose any janitorial company.', {
-      x: 0.5, y: 0.28, w: 9, h: 0.48, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: LM, y: 0.28, w: CW, h: 0.50, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
     s.addText('Here is why our clients stay for an average of 6 years.', {
-      x: 0.5, y: 0.76, w: 9, h: 0.26, fontSize: 12, color: MGRAY, fontFace: 'Calibri'
+      x: LM, y: 0.78, w: CW, h: 0.26, fontSize: 12, color: MGRAY, fontFace: 'Calibri'
     });
-    hairline(s, 0.5, 1.08, 9.0);
+    hl(s, LM, 1.08, CW);
 
+    // 3 columns: each 2.9" wide, separated by vertical hairlines at x=3.57 and x=6.63
+    const COL_W = 2.88;
     const cols = [
       {
-        x: 0.5, stat: '92%+', label: 'avg. inspection score', title: 'Real-Time Quality Assurance',
-        body: 'Every service is tracked through a third-party inspection platform. Scores are logged, time-stamped, and available to you in real time. You never have to wonder if the work was done.'
+        x: LM,
+        stat: '92%+', label: 'avg. inspection score', title: 'Real-Time Quality Assurance',
+        body: 'Every service is tracked through a third-party inspection platform. Scores are logged, time-stamped, and available to you in real time. You never have to wonder if the work was done — or how well.'
       },
       {
-        x: 3.65, stat: '<24hr', label: 'avg. resolution time', title: 'Documented Service Resolution',
-        body: 'Every issue generates a service ticket with a timestamp and assigned owner. Problems are tracked from open to closed — nothing falls through the cracks and no response goes undocumented.'
+        x: 3.56,
+        stat: '<24hr', label: 'avg. resolution time', title: 'Documented Service Resolution',
+        body: 'Every issue generates a service ticket with a timestamp and assigned owner. Problems are tracked from open to closed — nothing falls through the cracks and every response is documented.'
       },
       {
-        x: 6.82, stat: 'CEO', label: 'is your primary contact', title: 'Direct Executive Access',
-        body: 'Hereford Johnson, US Air Force veteran and company founder, picks up the phone. No account managers, no call routing, no corporate layers between you and the person responsible.'
+        x: 6.62,
+        stat: 'CEO', label: 'is your primary contact', title: 'Direct Executive Access',
+        body: 'Hereford Johnson, US Air Force veteran and company founder, picks up the phone. No account managers, no call routing, no corporate layers between you and the person ultimately responsible.'
       }
     ];
 
     cols.forEach((c, i) => {
-      if (i > 0) vline(s, c.x - 0.17, 1.12, 4.10);
-      s.addText(c.stat, { x: c.x, y: 1.18, w: 2.9, h: 0.90, fontSize: 48, bold: true, color: NAVY, fontFace: 'Trebuchet MS' });
-      s.addText(c.label, { x: c.x, y: 2.10, w: 2.9, h: 0.24, fontSize: 10, color: LGRAY, fontFace: 'Calibri' });
-      hairline(s, c.x, 2.38, 2.9);
-      s.addText(c.title, { x: c.x, y: 2.46, w: 2.9, h: 0.30, fontSize: 13, bold: true, color: DKGRAY, fontFace: 'Trebuchet MS' });
-      s.addText(c.body, { x: c.x, y: 2.82, w: 2.9, h: 1.30, fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true });
+      if (i > 0) vl(s, c.x - 0.14, 1.10, 3.96);
+      s.addText(c.stat, {
+        x: c.x, y: 1.16, w: COL_W, h: 0.95,
+        fontSize: 50, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      });
+      s.addText(c.label, {
+        x: c.x, y: 2.12, w: COL_W, h: 0.26,
+        fontSize: 10, color: LGRAY, fontFace: 'Calibri'
+      });
+      hl(s, c.x, 2.42, COL_W);
+      s.addText(c.title, {
+        x: c.x, y: 2.50, w: COL_W, h: 0.30,
+        fontSize: 13, bold: true, color: DKGRAY, fontFace: 'Trebuchet MS'
+      });
+      s.addText(c.body, {
+        x: c.x, y: 2.84, w: COL_W, h: 1.62,
+        fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true
+      });
     });
 
-    hairline(s, 0.5, 4.50, 9.0);
+    hl(s, LM, 4.54, CW);
     s.addText('"We surveyed our clients on what we should do more of. The #1 answer was communication and integrity. We believe this is why our average client has been with us for 6 years."', {
-      x: 0.5, y: 4.56, w: 8.8, h: 0.40, fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri', wrap: true
+      x: LM, y: 4.60, w: CW, h: 0.44,
+      fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri', wrap: true
     });
+
+    validateSlide('Why MDF', [
+      { name: 'headline', y: 0.28, h: 0.50 },
+      { name: 'columns', y: 1.16, h: 3.30 },
+      { name: 'pullquote', y: 4.60, h: 0.44 }
+    ]);
   }
 
-  // ── SLIDE 3: WE UNDERSTAND YOUR FACILITY ────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 3 — YOUR FACILITY
+  // Layout: left 58% narrative prose + pull-quote, right 38% stacked stat rows
+  //         separated by horizontal rules only — NO vertical hairline rule
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
     s.background = { color: WHITE };
-    addContentChrome(s, prs, 3, 'YOUR FACILITY');
+    addChrome(s, prs, 3, 'YOUR FACILITY');
+
+    const LW = 5.40;  // left zone width
+    const RX = 6.00;  // right zone x start
+    const RW = 3.56;  // right zone width
 
     s.addText('We built this for Logical Systems.', {
-      x: 0.5, y: 0.28, w: 5.4, h: 0.52, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: LM, y: 0.28, w: LW, h: 0.50, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
-    hairline(s, 0.5, 0.86, 5.4);
+    hl(s, LM, 0.84, LW);
 
     s.addText(
       'LSI operates manufacturing and industrial facilities where precision, compliance, and uptime are non-negotiable. ' +
-      'Your environment demands cleaning that works around production schedules, protects sensitive controls equipment, and meets the documentation standards your own clients expect from you.\n\n' +
-      'MDF delivers compliance-ready facility services designed for automation and controls environments. We coordinate around your production calendar, document every service, and treat your facility with the same operational discipline your team applies to every project.',
-      { x: 0.5, y: 0.96, w: 5.4, h: 2.10, fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true }
+      'Your environment demands cleaning that works around production schedules, protects sensitive controls equipment, ' +
+      'and meets the documentation standards your own clients expect from you.\n\n' +
+      'MDF delivers compliance-ready facility services designed for automation and controls environments. ' +
+      'We coordinate around your production calendar, document every service, and treat your facility with ' +
+      'the same operational discipline your team applies to every project.\n\n' +
+      'LSI\'s first customer from 1985 is still active today. Our oldest client relationship is 12 years. ' +
+      'Retention isn\'t accidental — it\'s the product of showing up consistently and fixing problems fast.',
+      {
+        x: LM, y: 0.94, w: LW, h: 2.62,
+        fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true
+      }
     );
 
-    s.addText('Your core values — service, integrity, and excellence — are the same values we build our teams around. That alignment isn\'t coincidental. It\'s why this works.', {
-      x: 0.5, y: 3.18, w: 5.4, h: 0.60, fontSize: 11, italic: true, color: PROSPECT, fontFace: 'Calibri', wrap: true
+    hl(s, LM, 3.64, LW);
+    s.addText(
+      '"Your core values — service, integrity, and excellence — are the same values we build our teams around. ' +
+      'That alignment isn\'t coincidental. It\'s why this partnership works."',
+      {
+        x: LM, y: 3.72, w: LW, h: 0.72,
+        fontSize: 11, italic: true, color: PROSPECT, fontFace: 'Calibri', wrap: true
+      }
+    );
+    hl(s, LM, 4.52, LW);
+    s.addText('— Hereford Johnson, CEO, Mad Dog Facility Partners', {
+      x: LM, y: 4.58, w: LW, h: 0.24,
+      fontSize: 9, color: LGRAY, fontFace: 'Calibri'
     });
 
-    vline(s, 6.05, 0.26, 4.65);
-
+    // Right zone — three stat rows separated by horizontal rules (no vline)
     const facts = [
-      { stat: 'Manufacturing / Automation', label: 'INDUSTRY' },
+      { stat: 'Manufacturing / Automation', label: 'INDUSTRY TYPE' },
       { stat: 'Controls Integrator Since 1985', label: 'FACILITY PROFILE' },
       { stat: 'OSHA / Production-Grade', label: 'COMPLIANCE CONTEXT' },
     ];
-
+    const STAT_ROW_H = 1.40;
     facts.forEach((f, i) => {
-      const y = 0.55 + i * 1.40;
-      s.addText(f.label, { x: 6.28, y, w: 3.4, h: 0.20, fontSize: 7.5, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 2.5 });
-      s.addText(f.stat, { x: 6.28, y: y + 0.24, w: 3.4, h: 0.50, fontSize: 16, bold: true, color: NAVY, fontFace: 'Trebuchet MS', wrap: true });
-      if (i < facts.length - 1) hairline(s, 6.28, y + 0.84, 3.4);
+      const y = 0.50 + i * STAT_ROW_H;
+      s.addText(f.label, {
+        x: RX, y, w: RW, h: 0.22,
+        fontSize: 7.5, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 2.5
+      });
+      s.addText(f.stat, {
+        x: RX, y: y + 0.26, w: RW, h: 0.56,
+        fontSize: 18, bold: true, color: NAVY, fontFace: 'Trebuchet MS', wrap: true
+      });
+      if (i < facts.length - 1) hl(s, RX, y + 1.00, RW);
     });
+
+    validateSlide('Facility', [
+      { name: 'prose', y: 0.94, h: 2.62 },
+      { name: 'pull-quote', y: 3.72, h: 0.72 },
+      { name: 'attribution', y: 4.58, h: 0.24 },
+      { name: 'stats', y: 0.50, h: 3 * STAT_ROW_H }
+    ]);
   }
 
-  // ── SLIDE 4: SCOPE OF WORK ───────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 4 — SCOPE OF WORK
+  // Layout: three horizontal frequency bands stacked full-width
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
     s.background = { color: WHITE };
-    addContentChrome(s, prs, 4, 'SCOPE OF WORK');
+    addChrome(s, prs, 4, 'SCOPE OF WORK');
 
     s.addText('Your Facility. Your Scope.', {
-      x: 0.5, y: 0.28, w: 9, h: 0.48, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: LM, y: 0.28, w: CW, h: 0.50, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
     s.addText('Weekly service  ·  Start July 1, 2026  ·  Month-to-Month  ·  30-Day Notice', {
-      x: 0.5, y: 0.76, w: 9, h: 0.26, fontSize: 11, color: MGRAY, fontFace: 'Calibri'
+      x: LM, y: 0.78, w: CW, h: 0.26, fontSize: 11, color: MGRAY, fontFace: 'Calibri'
     });
-    hairline(s, 0.5, 1.08, 9.0);
+    hl(s, LM, 1.08, CW);
 
-    const zones = [
-      { name: 'Offices & Common Areas', tasks: 'General dusting, front glass cleaning, office mopping/sweeping/vacuuming (weekly); desk dusting (quarterly)' },
-      { name: 'Restrooms — 3 Total', tasks: 'Full sanitize & disinfect all fixtures, mop & disinfect floors, clean mirrors & chrome, empty & reline trash (weekly)' },
-      { name: 'Break Room / Kitchen', tasks: 'Wipe countertops & tables, inside & outside of microwave, outside of fridge & water machine, breakroom tables & chairs (weekly); inside fridge (monthly)' },
-      { name: 'Warehouse / Production Floor', tasks: 'Full dust mopping throughout (weekly)' },
-      { name: 'Periodic Services', tasks: 'Baseboard cleaning (quarterly); OrangeQC quality inspection reports (weekly)' },
+    // Weekly tasks (9) in 2 columns of 4–5 rows each
+    const weeklyLeft = [
+      'Restrooms (3): sanitize & disinfect all fixtures',
+      'Restrooms: mop & disinfect floors, clean mirrors',
+      'General dusting — all areas',
+      'Front glass cleaning',
+      'Office mopping, sweeping & vacuuming',
     ];
+    const weeklyRight = [
+      'Break room countertops, tables & chairs',
+      'Microwave — inside & outside',
+      'Refrigerator & water machine exterior',
+      'Kitchen area full wipe-down',
+      'Warehouse dust mopping throughout',
+    ];
+    const monthlyTasks = ['Refrigerator interior deep clean'];
+    const quarterlyTasks = ['Baseboard cleaning — all areas', 'Desk dusting — all offices'];
 
-    const left = zones.slice(0, 3);
-    const right = zones.slice(3);
+    const ROW_H   = 0.32;
+    const HDR_H   = 0.30;
+    const BAND_PAD = 0.08;  // top padding inside band before first row
 
-    const rowH = 1.24;
-    left.forEach((z, i) => {
-      const y = 1.16 + i * rowH;
-      s.addText(z.name, { x: 0.5, y, w: 4.3, h: 0.28, fontSize: 12, bold: true, color: DKGRAY, fontFace: 'Trebuchet MS' });
-      s.addText(z.tasks, { x: 0.5, y: y + 0.32, w: 4.3, h: 0.82, fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true });
-      if (i < left.length - 1) hairline(s, 0.5, y + rowH - 0.06, 4.3);
+    // ── WEEKLY BAND ──
+    const wRows = Math.max(weeklyLeft.length, weeklyRight.length);
+    const wBandH = HDR_H + BAND_PAD + wRows * ROW_H + 0.08;
+    const wY = 1.12;
+
+    s.addShape('rect', { x: LM, y: wY, w: CW, h: wBandH, fill: { color: BAND_W }, line: { color: BAND_W } });
+    s.addText('WEEKLY', {
+      x: LM + 0.14, y: wY + 0.06, w: 1.5, h: 0.20,
+      fontSize: 9, bold: true, color: NAVY, fontFace: 'Calibri', charSpacing: 2
     });
 
-    vline(s, 5.05, 1.12, 3.85);
+    const COL_W2 = (CW - 0.28) / 2;
+    const tickX_L = LM + 0.14;
+    const textX_L = tickX_L + 0.18;
+    const tickX_R = LM + 0.14 + COL_W2 + 0.14;
+    const textX_R = tickX_R + 0.18;
 
-    right.forEach((z, i) => {
-      const y = 1.16 + i * rowH;
-      s.addText(z.name, { x: 5.25, y, w: 4.3, h: 0.28, fontSize: 12, bold: true, color: DKGRAY, fontFace: 'Trebuchet MS' });
-      s.addText(z.tasks, { x: 5.25, y: y + 0.32, w: 4.3, h: 0.82, fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true });
-      if (i < right.length - 1) hairline(s, 5.25, y + rowH - 0.06, 4.3);
+    for (let i = 0; i < weeklyLeft.length; i++) {
+      const ry = wY + HDR_H + BAND_PAD + i * ROW_H;
+      s.addShape('rect', { x: tickX_L, y: ry + 0.04, w: 0.05, h: 0.24, fill: { color: NAVY }, line: { color: NAVY } });
+      s.addText(weeklyLeft[i], {
+        x: textX_L, y: ry + 0.06, w: COL_W2 - 0.22, h: 0.22,
+        fontSize: 10, color: DKGRAY, fontFace: 'Calibri'
+      });
+      s.addText('Weekly', {
+        x: textX_L + COL_W2 - 0.88, y: ry + 0.06, w: 0.72, h: 0.22,
+        fontSize: 8, italic: true, color: LGRAY, fontFace: 'Calibri', align: 'right'
+      });
+    }
+    for (let i = 0; i < weeklyRight.length; i++) {
+      const ry = wY + HDR_H + BAND_PAD + i * ROW_H;
+      s.addShape('rect', { x: tickX_R, y: ry + 0.04, w: 0.05, h: 0.24, fill: { color: NAVY }, line: { color: NAVY } });
+      s.addText(weeklyRight[i], {
+        x: textX_R, y: ry + 0.06, w: COL_W2 - 0.22, h: 0.22,
+        fontSize: 10, color: DKGRAY, fontFace: 'Calibri'
+      });
+      s.addText('Weekly', {
+        x: textX_R + COL_W2 - 0.88, y: ry + 0.06, w: 0.72, h: 0.22,
+        fontSize: 8, italic: true, color: LGRAY, fontFace: 'Calibri', align: 'right'
+      });
+    }
+
+    // ── MONTHLY BAND ──
+    const mY = wY + wBandH + 0.06;
+    const mBandH = HDR_H + BAND_PAD + monthlyTasks.length * ROW_H + 0.08;
+    s.addShape('rect', { x: LM, y: mY, w: CW, h: mBandH, fill: { color: BAND_M }, line: { color: BAND_M } });
+    s.addText('MONTHLY', {
+      x: LM + 0.14, y: mY + 0.06, w: 1.5, h: 0.20,
+      fontSize: 9, bold: true, color: NAVY, fontFace: 'Calibri', charSpacing: 2
     });
+    monthlyTasks.forEach((task, i) => {
+      const ry = mY + HDR_H + BAND_PAD + i * ROW_H;
+      s.addShape('rect', { x: tickX_L, y: ry + 0.04, w: 0.05, h: 0.24, fill: { color: NAVY }, line: { color: NAVY } });
+      s.addText(task, {
+        x: textX_L, y: ry + 0.06, w: CW - 1.2, h: 0.22,
+        fontSize: 10, color: DKGRAY, fontFace: 'Calibri'
+      });
+      s.addText('Monthly', {
+        x: LM + CW - 1.0, y: ry + 0.06, w: 0.72, h: 0.22,
+        fontSize: 8, italic: true, color: LGRAY, fontFace: 'Calibri', align: 'right'
+      });
+    });
+
+    // ── QUARTERLY BAND ──
+    const qY = mY + mBandH + 0.06;
+    const qBandH = HDR_H + BAND_PAD + quarterlyTasks.length * ROW_H + 0.08;
+    s.addShape('rect', { x: LM, y: qY, w: CW, h: qBandH, fill: { color: 'F0F4FF' }, line: { color: 'F0F4FF' } });
+    s.addText('QUARTERLY', {
+      x: LM + 0.14, y: qY + 0.06, w: 1.8, h: 0.20,
+      fontSize: 9, bold: true, color: NAVY, fontFace: 'Calibri', charSpacing: 2
+    });
+    quarterlyTasks.forEach((task, i) => {
+      const ry = qY + HDR_H + BAND_PAD + i * ROW_H;
+      s.addShape('rect', { x: tickX_L, y: ry + 0.04, w: 0.05, h: 0.24, fill: { color: NAVY }, line: { color: NAVY } });
+      s.addText(task, {
+        x: textX_L, y: ry + 0.06, w: CW - 1.2, h: 0.22,
+        fontSize: 10, color: DKGRAY, fontFace: 'Calibri'
+      });
+      s.addText('Quarterly', {
+        x: LM + CW - 1.0, y: ry + 0.06, w: 0.80, h: 0.22,
+        fontSize: 8, italic: true, color: LGRAY, fontFace: 'Calibri', align: 'right'
+      });
+    });
+
+    // Footer note
+    const footY = qY + qBandH + 0.10;
+    hl(s, LM, footY, CW);
+    s.addText('All frequencies confirmed at onboarding walkthrough with CEO and QA Manager.', {
+      x: LM, y: footY + 0.06, w: CW, h: 0.22,
+      fontSize: 9, italic: true, color: MGRAY, fontFace: 'Calibri'
+    });
+
+    validateSlide('Scope', [
+      { name: 'weekly band', y: wY, h: wBandH },
+      { name: 'monthly band', y: mY, h: mBandH },
+      { name: 'quarterly band', y: qY, h: qBandH },
+      { name: 'footer note', y: footY, h: 0.28 }
+    ]);
   }
 
-  // ── SLIDE 5: YOUR TEAM ───────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 5 — YOUR TEAM
+  // Layout: three equal columns, circular headshots centered above name/title/bio
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
     s.background = { color: WHITE };
-    addContentChrome(s, prs, 5, 'YOUR TEAM');
+    addChrome(s, prs, 5, 'YOUR TEAM');
 
     s.addText('Your Team. Not a Call Center.', {
-      x: 0.5, y: 0.28, w: 9, h: 0.48, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: LM, y: 0.28, w: CW, h: 0.50, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
     s.addText('Three people accountable to your facility — by name, by role, by phone.', {
-      x: 0.5, y: 0.76, w: 9, h: 0.26, fontSize: 12, color: MGRAY, fontFace: 'Calibri'
+      x: LM, y: 0.78, w: CW, h: 0.26, fontSize: 12, color: MGRAY, fontFace: 'Calibri'
     });
-    hairline(s, 0.5, 1.08, 9.0);
+    hl(s, LM, 1.08, CW);
 
+    const COL_W3 = 2.88;
     const team = [
       {
-        img: './hereford.png',
+        img: './hereford.png', x: LM,
         name: 'Hereford Johnson',
         creds: 'US Air Force Veteran · SDVOSB · ISSA Member',
         title: 'CEO & Owner',
-        stmt: 'Your primary contact. Picks up the phone personally — no account managers, no call routing, no corporate layers between you and the person accountable.',
-        x: 0.5
+        stmt: 'Your primary point of contact. Reachable directly by phone — no account managers, no routing, no corporate buffer between you and the person ultimately accountable for every service.'
       },
       {
-        img: './victoriana.png',
+        img: './victoriana.png', x: 3.56,
         name: 'Victoriana Johnson',
         creds: 'Certified QA Inspector · OrangeQC Platform',
         title: 'QA Manager',
-        stmt: 'Conducts weekly on-site inspections, logs every score in OrangeQC, and personally owns resolution follow-through on every open ticket.',
-        x: 3.65
+        stmt: 'Conducts weekly on-site inspections, logs every score, and personally owns resolution follow-through on every open service ticket. If a score drops, she is the first to know and the first to respond.'
       },
       {
-        img: './johanna.png',
+        img: './johanna.png', x: 6.62,
         name: 'Johanna Hernandez',
         creds: 'Talent Acquisition · Training & Certification',
         title: 'Area Talent Manager',
-        stmt: 'Handles recruiting, vetting, and ongoing training of custodial staff. Ensures every person assigned to your facility is background-checked, trained, and accountable.',
-        x: 6.82
+        stmt: 'Handles recruiting, vetting, background checks, and ongoing training for all custodial staff. Every person assigned to your facility is screened, trained to your environment, and held to documented standards.'
       }
     ];
 
     team.forEach((t, i) => {
-      if (i > 0) vline(s, t.x - 0.17, 1.12, 4.08);
-      s.addImage({ path: t.img, x: t.x + 0.75, y: 1.18, w: 1.05, h: 1.05, rounding: true });
-      s.addText(t.name, { x: t.x, y: 2.30, w: 2.9, h: 0.30, fontSize: 13, bold: true, color: NAVY, fontFace: 'Trebuchet MS', align: 'center' });
-      s.addText(t.creds, { x: t.x, y: 2.62, w: 2.9, h: 0.30, fontSize: 9, color: LGRAY, fontFace: 'Calibri', align: 'center', wrap: true });
-      s.addText(t.title, { x: t.x, y: 2.94, w: 2.9, h: 0.24, fontSize: 11, bold: true, color: PROSPECT, fontFace: 'Calibri', align: 'center' });
-      hairline(s, t.x, 3.22, 2.9);
-      s.addText(t.stmt, { x: t.x, y: 3.30, w: 2.9, h: 1.08, fontSize: 10.5, color: MGRAY, fontFace: 'Calibri', align: 'left', wrap: true });
+      if (i > 0) vl(s, t.x - 0.14, 1.10, 3.96);
+      const cx = t.x + (COL_W3 - 1.10) / 2;
+      s.addImage({ path: t.img, x: cx, y: 1.18, w: 1.10, h: 1.10, rounding: true });
+      s.addText(t.name, {
+        x: t.x, y: 2.36, w: COL_W3, h: 0.30,
+        fontSize: 13, bold: true, color: NAVY, fontFace: 'Trebuchet MS', align: 'center'
+      });
+      s.addText(t.creds, {
+        x: t.x, y: 2.68, w: COL_W3, h: 0.30,
+        fontSize: 9, color: LGRAY, fontFace: 'Calibri', align: 'center', wrap: true
+      });
+      s.addText(t.title, {
+        x: t.x, y: 3.00, w: COL_W3, h: 0.26,
+        fontSize: 11, bold: true, color: PROSPECT, fontFace: 'Calibri', align: 'center'
+      });
+      hl(s, t.x, 3.30, COL_W3);
+      s.addText(t.stmt, {
+        x: t.x, y: 3.38, w: COL_W3, h: 1.26,
+        fontSize: 10.5, color: MGRAY, fontFace: 'Calibri', wrap: true
+      });
     });
 
-    hairline(s, 0.5, 4.52, 9.0);
+    hl(s, LM, 4.72, CW);
     s.addText('"I\'ve held the mop. I\'ve been the crew. That\'s why we\'re built around accountability, not excuses." — Hereford Johnson, CEO', {
-      x: 0.5, y: 4.58, w: 8.8, h: 0.28, fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri'
+      x: LM, y: 4.78, w: CW, h: 0.24,
+      fontSize: 10, italic: true, color: MGRAY, fontFace: 'Calibri'
     });
+
+    validateSlide('Team', [
+      { name: 'headshots', y: 1.18, h: 1.10 },
+      { name: 'bios', y: 3.38, h: 1.26 },
+      { name: 'pullquote', y: 4.78, h: 0.24 }
+    ]);
   }
 
-  // ── SLIDE 6: QUALITY ASSURANCE — ORANGEQC ───────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 6 — QUALITY ASSURANCE
+  // Layout: left 42% three stacked feature rows, right 54% three large stats
+  //         ONE vertical hairline rule at x=4.4"
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
     s.background = { color: WHITE };
-    addContentChrome(s, prs, 6, 'QUALITY ASSURANCE');
+    addChrome(s, prs, 6, 'QUALITY ASSURANCE');
 
-    // Left content panel (~54% width)
     s.addText('You Get Full Visibility Into Every Clean.', {
-      x: 0.5, y: 0.28, w: 5.4, h: 0.52, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: LM, y: 0.28, w: CW, h: 0.50, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
-    hairline(s, 0.5, 0.86, 5.4);
+    hl(s, LM, 0.84, CW);
 
+    const LZ_W = 3.72;  // left zone width
+    const RX6  = 4.52;  // right zone x
+    const RW6  = RM - RX6;  // 5.08"
+
+    // Left: intro + three feature rows
     s.addText(
-      'Every MDF service is backed by a mobile inspection and ticketing platform that gives you real-time visibility into what\'s happening inside your facility.\n\n' +
-      'This is not an internal tool — it\'s a client-facing layer of accountability. You receive access to your own dashboard where inspection scores, service tickets, and resolution timelines are logged automatically after every visit.',
-      { x: 0.5, y: 0.96, w: 5.4, h: 1.72, fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true }
+      'Every MDF service is backed by a mobile inspection and ticketing platform that gives you real-time visibility into your facility. ' +
+      'This is not an internal tool — it is client-facing accountability. You receive access to your own dashboard.',
+      {
+        x: LM, y: 0.96, w: LZ_W, h: 0.88,
+        fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true
+      }
     );
+    hl(s, LM, 1.90, LZ_W);
 
-    hairline(s, 0.5, 2.76, 5.4);
-
-    // Three feature rows
     const features = [
-      { label: 'Inspection Scoring', desc: 'Every area graded at each visit. Scores trend over time — you see if standards are holding.' },
-      { label: 'Service Tickets', desc: 'Any flagged issue creates a ticket, assigned and time-stamped. Resolution tracked to close.' },
-      { label: 'Documented History', desc: 'Full audit trail of every service. Useful for compliance reviews, audits, and accountability records.' },
+      {
+        label: 'Inspection Scoring',
+        desc: 'Every area is graded at each visit. Scores trend over time — you can see at a glance whether standards are holding or slipping, week over week.'
+      },
+      {
+        label: 'Service Ticket System',
+        desc: 'Any flagged issue auto-creates a ticket, assigned to a team member and time-stamped. Resolution is tracked from open to close — nothing disappears.'
+      },
+      {
+        label: 'Full Audit Trail',
+        desc: 'Every service, every score, every resolved ticket lives in your dashboard. Useful for compliance reviews, facility audits, and ongoing accountability records.'
+      },
     ];
+    const FEAT_H = 0.94;
     features.forEach((f, i) => {
-      const fy = 2.86 + i * 0.72;
-      s.addText(f.label, { x: 0.5, y: fy, w: 1.65, h: 0.24, fontSize: 11, bold: true, color: DKGRAY, fontFace: 'Trebuchet MS' });
-      s.addText(f.desc, { x: 2.22, y: fy, w: 3.6, h: 0.50, fontSize: 10.5, color: MGRAY, fontFace: 'Calibri', wrap: true });
-      if (i < features.length - 1) hairline(s, 0.5, fy + 0.62, 5.4);
+      const fy = 1.98 + i * FEAT_H;
+      s.addText(f.label, {
+        x: LM, y: fy, w: LZ_W, h: 0.26,
+        fontSize: 12, bold: true, color: DKGRAY, fontFace: 'Trebuchet MS'
+      });
+      s.addText(f.desc, {
+        x: LM, y: fy + 0.30, w: LZ_W, h: 0.52,
+        fontSize: 10.5, color: MGRAY, fontFace: 'Calibri', wrap: true
+      });
+      if (i < features.length - 1) hl(s, LM, fy + FEAT_H - 0.06, LZ_W);
     });
 
-    // "Included at no extra charge" callout
-    hairline(s, 0.5, 5.00, 5.4);
+    hl(s, LM, 4.86, LZ_W);
     s.addText('Included with every MDF contract — at no additional charge.', {
-      x: 0.5, y: 5.06, w: 5.4, h: 0.22, fontSize: 10.5, italic: true, bold: false, color: GREEN, fontFace: 'Calibri'
+      x: LM, y: 4.92, w: LZ_W, h: 0.20,
+      fontSize: 10.5, italic: true, color: GREEN, fontFace: 'Calibri'
     });
 
-    // Right panel — stat column
-    vline(s, 6.05, 0.26, 4.85);
+    // Single vertical hairline
+    vl(s, 4.42, 0.84, 4.24);
 
-    const qcStats = [
+    // Right: 3 large stats stacked
+    const QC_STATS = [
       { stat: '90%+', label: 'TARGET INSPECTION SCORE', sub: 'Tracked and reported every week' },
-      { stat: '<2hr', label: 'AVERAGE RESPONSE TIME', sub: 'From ticket open to acknowledgment' },
-      { stat: '<24hr', label: 'AVERAGE RESOLUTION TIME', sub: 'From issue flagged to issue closed' },
+      { stat: '<2hr', label: 'AVERAGE RESPONSE TIME',   sub: 'Ticket open to acknowledgment' },
+      { stat: '<24hr', label: 'AVERAGE RESOLUTION TIME', sub: 'Issue flagged to issue closed' },
     ];
-    qcStats.forEach((st, i) => {
-      const sy = 0.48 + i * 1.52;
-      s.addText(st.label, { x: 6.28, y: sy, w: 3.4, h: 0.20, fontSize: 7.5, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 2.5 });
-      s.addText(st.stat, { x: 6.28, y: sy + 0.22, w: 3.4, h: 0.72, fontSize: 42, bold: true, color: NAVY, fontFace: 'Trebuchet MS' });
-      s.addText(st.sub, { x: 6.28, y: sy + 0.96, w: 3.4, h: 0.30, fontSize: 9.5, color: MGRAY, fontFace: 'Calibri', wrap: true });
-      if (i < qcStats.length - 1) hairline(s, 6.28, sy + 1.36, 3.4);
+    const STAT_H6 = 1.38;
+    QC_STATS.forEach((st, i) => {
+      const sy = 0.94 + i * STAT_H6;
+      s.addText(st.label, {
+        x: RX6, y: sy, w: RW6, h: 0.20,
+        fontSize: 7.5, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 2.5
+      });
+      s.addText(st.stat, {
+        x: RX6, y: sy + 0.22, w: RW6, h: 0.82,
+        fontSize: 48, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      });
+      s.addText(st.sub, {
+        x: RX6, y: sy + 1.06, w: RW6, h: 0.24,
+        fontSize: 10, color: MGRAY, fontFace: 'Calibri'
+      });
+      if (i < QC_STATS.length - 1) hl(s, RX6, sy + STAT_H6 - 0.04, RW6);
     });
+
+    validateSlide('QC', [
+      { name: 'features', y: 1.98, h: features.length * FEAT_H },
+      { name: 'stats', y: 0.94, h: QC_STATS.length * STAT_H6 },
+      { name: 'included', y: 4.92, h: 0.20 }
+    ]);
   }
 
-  // ── SLIDE 7: RAMP-UP PLAN ────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 7 — RAMP-UP PLAN
+  // Layout: full-width Gantt table, no column split
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
     s.background = { color: WHITE };
-    addContentChrome(s, prs, 7, 'RAMP-UP PLAN');
+    addChrome(s, prs, 7, 'RAMP-UP PLAN');
 
     s.addText('Your Ramp-Up. Before Day One.', {
-      x: 0.5, y: 0.28, w: 9, h: 0.48, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: LM, y: 0.28, w: CW, h: 0.50, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
-    hairline(s, 0.5, 0.82, 9.0);
+    hl(s, LM, 0.84, CW);
 
-    const gx = 0.5;
-    const gy = 0.90;
-    const colW = 1.38;
-    const rowH = 0.48;
-    const labelW = 3.05;
-    const cols = ['ACTIVITY', 'Wk -2', 'Wk -1', 'Week 1', 'Week 2', 'Mo. 2', 'Mo. 3'];
-    const numCols = cols.length - 1;
+    const GX     = LM;
+    const GY     = 0.92;
+    const LAB_W  = 3.10;
+    const N_COLS = 6;
+    const COL_WG = (CW - LAB_W) / N_COLS;  // ~1.0"
+    const ROW_HG = 0.46;
+    const COL_LABELS = ['Wk -2', 'Wk -1', 'Week 1', 'Week 2', 'Mo. 2', 'Mo. 3'];
 
     // Header row
-    s.addShape('rect', { x: gx, y: gy, w: labelW, h: rowH, fill: { color: NAVY }, line: { color: NAVY } });
-    s.addText('ACTIVITY', { x: gx + 0.10, y: gy + 0.14, w: labelW - 0.1, h: 0.22, fontSize: 8, bold: true, color: GOLD, fontFace: 'Calibri', charSpacing: 2 });
-    for (let c = 1; c < cols.length; c++) {
-      const cx = gx + labelW + (c - 1) * colW;
-      s.addShape('rect', { x: cx, y: gy, w: colW, h: rowH, fill: { color: NAVY }, line: { color: NAVY } });
-      s.addText(cols[c], { x: cx, y: gy + 0.14, w: colW, h: 0.22, fontSize: 9, color: LGRAY, fontFace: 'Calibri', align: 'center' });
-    }
+    s.addShape('rect', { x: GX, y: GY, w: LAB_W, h: ROW_HG, fill: { color: NAVY }, line: { color: NAVY } });
+    s.addText('ACTIVITY', {
+      x: GX + 0.12, y: GY + 0.13, w: LAB_W, h: 0.22,
+      fontSize: 8, bold: true, color: GOLD, fontFace: 'Calibri', charSpacing: 2
+    });
+    COL_LABELS.forEach((lbl, c) => {
+      const cx = GX + LAB_W + c * COL_WG;
+      s.addShape('rect', { x: cx, y: GY, w: COL_WG, h: ROW_HG, fill: { color: NAVY }, line: { color: NAVY } });
+      s.addText(lbl, {
+        x: cx, y: GY + 0.13, w: COL_WG, h: 0.22,
+        fontSize: 9, color: LGRAY, fontFace: 'Calibri', align: 'center'
+      });
+    });
 
     const activities = [
-      { name: 'CEO + QA Manager Site Walk',    bars: [0,1], color: GOLD },
-      { name: 'Key Handoff & Supply Staging',  bars: [0,1], color: GOLD },
-      { name: 'Team Assignment & Orientation', bars: [1],   color: GOLD },
-      { name: 'Service Launch',                bars: [2],   color: NAVY },
-      { name: 'Daily Supervisor Check-Ins',    bars: [2,3], color: NAVY },
-      { name: 'OrangeQC Baseline Report',      bars: [2,3], color: NAVY },
-      { name: '30-Day Review Call',            bars: [4],   color: GREEN },
-      { name: '90-Day QBR & Scope Review',     bars: [5],   color: GREEN },
+      { name: 'CEO + QA Manager Site Walk',    bars: [0, 1], color: GOLD  },
+      { name: 'Key Handoff & Supply Staging',  bars: [0, 1], color: GOLD  },
+      { name: 'Team Assignment & Orientation', bars: [1],    color: GOLD  },
+      { name: 'Service Launch',                bars: [2],    color: NAVY  },
+      { name: 'Daily Supervisor Check-Ins',    bars: [2, 3], color: NAVY  },
+      { name: 'OrangeQC Baseline Report',      bars: [2, 3], color: NAVY  },
+      { name: '30-Day Review Call',            bars: [4],    color: '2E6B3E' },
+      { name: '90-Day QBR & Scope Review',     bars: [5],    color: '2E6B3E' },
     ];
 
     activities.forEach((act, i) => {
-      const ry = gy + rowH + i * rowH;
-      const rowColor = i % 2 === 0 ? WHITE : 'F4F7FB';
-      s.addShape('rect', { x: gx, y: ry, w: labelW, h: rowH, fill: { color: rowColor }, line: { color: RULE } });
-      s.addText(act.name, { x: gx + 0.10, y: ry + 0.13, w: labelW - 0.15, h: 0.24, fontSize: 9.5, color: DKGRAY, fontFace: 'Calibri' });
-
-      for (let c = 0; c < numCols; c++) {
-        const cx = gx + labelW + c * colW;
-        s.addShape('rect', { x: cx, y: ry, w: colW, h: rowH, fill: { color: rowColor }, line: { color: RULE } });
+      const ry = GY + ROW_HG + i * ROW_HG;
+      const rowBg = i % 2 === 0 ? WHITE : 'F4F7FB';
+      s.addShape('rect', { x: GX, y: ry, w: LAB_W, h: ROW_HG, fill: { color: rowBg }, line: { color: RULE } });
+      s.addText(act.name, {
+        x: GX + 0.12, y: ry + 0.13, w: LAB_W - 0.16, h: 0.22,
+        fontSize: 10, color: DKGRAY, fontFace: 'Calibri'
+      });
+      for (let c = 0; c < N_COLS; c++) {
+        const cx = GX + LAB_W + c * COL_WG;
+        s.addShape('rect', { x: cx, y: ry, w: COL_WG, h: ROW_HG, fill: { color: rowBg }, line: { color: RULE } });
       }
-
       if (act.bars.length > 0) {
-        const barStart = gx + labelW + act.bars[0] * colW + 0.07;
-        const barEnd   = gx + labelW + (act.bars[act.bars.length - 1] + 1) * colW - 0.07;
+        const bx = GX + LAB_W + act.bars[0] * COL_WG + 0.06;
+        const bw = (act.bars[act.bars.length - 1] - act.bars[0] + 1) * COL_WG - 0.12;
         s.addShape('rect', {
-          x: barStart, y: ry + 0.11, w: barEnd - barStart, h: rowH * 0.55,
+          x: bx, y: ry + 0.10, w: bw, h: ROW_HG * 0.55,
           fill: { color: act.color }, line: { color: act.color }
         });
       }
     });
 
-    const legendY = gy + rowH + activities.length * rowH + 0.12;
-    [[GOLD,'Pre-Start'], [NAVY,'Active Service'], [GREEN,'Milestone Review']].forEach(([c, label], i) => {
-      const lx = 0.5 + i * 3.0;
-      s.addShape('rect', { x: lx, y: legendY, w: 0.24, h: 0.15, fill: { color: c }, line: { color: c } });
-      s.addText(label, { x: lx + 0.32, y: legendY - 0.01, w: 2.4, h: 0.18, fontSize: 9, color: MGRAY, fontFace: 'Calibri' });
+    const legY = GY + ROW_HG * (1 + activities.length) + 0.10;
+    [[GOLD, 'Pre-Start'], [NAVY, 'Active Service'], ['2E6B3E', 'Milestone Review']].forEach(([c, lbl], i) => {
+      const lx = LM + i * 3.0;
+      s.addShape('rect', { x: lx, y: legY, w: 0.24, h: 0.16, fill: { color: c }, line: { color: c } });
+      s.addText(lbl, {
+        x: lx + 0.32, y: legY - 0.01, w: 2.5, h: 0.18,
+        fontSize: 9, color: MGRAY, fontFace: 'Calibri'
+      });
     });
+
+    const ganttBottom = GY + ROW_HG * (1 + activities.length);
+    validateSlide('Gantt', [
+      { name: 'gantt table', y: GY, h: ROW_HG * (1 + activities.length) },
+      { name: 'legend', y: legY, h: 0.18 }
+    ]);
   }
 
-  // ── SLIDE 8: SOCIAL PROOF ────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 8 — SOCIAL PROOF
+  // Layout: full-width hero quote (top), two secondary quotes side-by-side (mid),
+  //         right logo strip with real images — horizontal rules separate zones
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
     s.background = { color: WHITE };
-    addContentChrome(s, prs, 8, 'CLIENT TESTIMONIALS');
+    addChrome(s, prs, 8, 'CLIENT TESTIMONIALS');
 
     s.addText('What Our Clients Say.', {
-      x: 0.5, y: 0.28, w: 7, h: 0.48, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: LM, y: 0.28, w: CW, h: 0.50, fontSize: 24, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
     s.addText('Facilities that can\'t afford to get it wrong — and don\'t.', {
-      x: 0.5, y: 0.76, w: 7, h: 0.26, fontSize: 12, color: MGRAY, fontFace: 'Calibri'
+      x: LM, y: 0.78, w: CW, h: 0.26, fontSize: 12, color: MGRAY, fontFace: 'Calibri'
     });
-    hairline(s, 0.5, 1.08, 9.0);
+    hl(s, LM, 1.08, CW);
 
-    // Hero quote
+    // Vertical hairline separating quotes from logo strip
+    const LOGO_X = 7.72;
+    const LOGO_W = RM - LOGO_X;  // 1.88"
+    const QUOTE_W = LOGO_X - LM - 0.14;  // 7.08"
+    vl(s, LOGO_X, 1.10, 3.96);
+
+    // ── TOP ZONE: hero quote (y=1.14 to ~2.90) ──
     s.addText(
-      '"What impressed us most was their understanding of our compliance requirements. They didn\'t just clean — they followed our protocols, documented everything, and worked around our production schedule without missing a beat."',
-      { x: 0.5, y: 1.18, w: 6.6, h: 1.00, fontSize: 13, italic: true, color: NAVY, fontFace: 'Georgia', wrap: true }
+      '"What impressed us most was their understanding of our compliance requirements. They didn\'t just clean — ' +
+      'they followed our protocols, documented everything, and worked around our production schedule without missing a beat."',
+      {
+        x: LM, y: 1.14, w: QUOTE_W, h: 1.14,
+        fontSize: 13, italic: true, color: NAVY, fontFace: 'Georgia', wrap: true
+      }
     );
     s.addText('— Manufacturing Plant Operations Manager', {
-      x: 0.5, y: 2.20, w: 6.6, h: 0.22, fontSize: 9.5, color: LGRAY, fontFace: 'Calibri'
+      x: LM, y: 2.30, w: QUOTE_W, h: 0.24,
+      fontSize: 9.5, color: LGRAY, fontFace: 'Calibri'
     });
-    hairline(s, 0.5, 2.48, 6.6);
+    hl(s, LM, 2.60, QUOTE_W);
 
-    // Two secondary quotes
+    // ── MIDDLE ZONE: two secondary quotes (y=2.66 to ~3.82) ──
+    const Q_W2 = (QUOTE_W - 0.20) / 2;
+
     s.addText('"The team at MDF understands that in our environment, cleaning is part of our safety program — not just an afterthought."', {
-      x: 0.5, y: 2.58, w: 3.1, h: 0.80, fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri', wrap: true
+      x: LM, y: 2.70, w: Q_W2, h: 0.72,
+      fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri', wrap: true
     });
     s.addText('— Sheriff\'s Office Facility Manager', {
-      x: 0.5, y: 3.40, w: 3.1, h: 0.20, fontSize: 8.5, color: LGRAY, fontFace: 'Calibri'
+      x: LM, y: 3.44, w: Q_W2, h: 0.20,
+      fontSize: 9, color: LGRAY, fontFace: 'Calibri'
     });
 
     s.addText('"We\'ve worked with several cleaning companies over the years, but Mad Dog is different. When there\'s an issue, they fix it immediately."', {
-      x: 3.75, y: 2.58, w: 3.1, h: 0.80, fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri', wrap: true
+      x: LM + Q_W2 + 0.20, y: 2.70, w: Q_W2, h: 0.72,
+      fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri', wrap: true
     });
     s.addText('— Government Administrator', {
-      x: 3.75, y: 3.40, w: 3.1, h: 0.20, fontSize: 8.5, color: LGRAY, fontFace: 'Calibri'
+      x: LM + Q_W2 + 0.20, y: 3.44, w: Q_W2, h: 0.20,
+      fontSize: 9, color: LGRAY, fontFace: 'Calibri'
     });
+    hl(s, LM, 3.72, QUOTE_W);
 
-    vline(s, 7.32, 1.10, 3.80);
-
-    const stats = [
-      { stat: 'FAA', label: 'CERTIFIED PAST PERFORMANCE' },
-      { stat: 'Army', label: 'PAST PERFORMANCE' },
-      { stat: 'ISSA', label: 'INDUSTRY MEMBER' },
-    ];
-    stats.forEach((st, i) => {
-      const sy = 1.28 + i * 1.24;
-      s.addText(st.stat, { x: 7.56, y: sy, w: 2.1, h: 0.58, fontSize: 26, bold: true, color: NAVY, fontFace: 'Trebuchet MS', align: 'center' });
-      s.addText(st.label, { x: 7.56, y: sy + 0.60, w: 2.1, h: 0.22, fontSize: 8, bold: true, color: LGRAY, fontFace: 'Calibri', align: 'center', charSpacing: 1.5 });
-      if (i < stats.length - 1) hairline(s, 7.56, sy + 0.90, 2.1);
-    });
-
-    // Third quote bottom
-    hairline(s, 0.5, 3.72, 6.6);
+    // ── BOTTOM ZONE: third quote (y=3.78 to ~4.9) ──
     s.addText('"The background checks and professionalism of their crew gave us confidence from day one. In a government facility, security and accountability aren\'t negotiable. Mad Dog gets that."', {
-      x: 0.5, y: 3.80, w: 6.6, h: 0.56, fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri', wrap: true
+      x: LM, y: 3.80, w: QUOTE_W, h: 0.82,
+      fontSize: 10.5, italic: true, color: MGRAY, fontFace: 'Calibri', wrap: true
     });
     s.addText('— Municipal Building Supervisor', {
-      x: 0.5, y: 4.38, w: 6.6, h: 0.20, fontSize: 8.5, color: LGRAY, fontFace: 'Calibri'
+      x: LM, y: 4.64, w: QUOTE_W, h: 0.20,
+      fontSize: 9, color: LGRAY, fontFace: 'Calibri'
     });
+
+    // ── LOGO STRIP: FAA, Army, ISSA stacked ──
+    const logos = [
+      { path: './logo_faa.png',  label: 'Certified Past Performance', y: 1.22 },
+      { path: './logo_army.png', label: 'Past Performance',           y: 2.62 },
+      { path: './logo_issa.png', label: 'Industry Member',            y: 4.02 },
+    ];
+    logos.forEach(lg => {
+      s.addImage({
+        path: lg.path,
+        x: LOGO_X + 0.12, y: lg.y, w: LOGO_W - 0.24, h: 0.80,
+        sizing: { type: 'contain', w: LOGO_W - 0.24, h: 0.80 }
+      });
+      s.addText(lg.label, {
+        x: LOGO_X + 0.08, y: lg.y + 0.86, w: LOGO_W - 0.16, h: 0.20,
+        fontSize: 7, color: LGRAY, fontFace: 'Calibri', align: 'center'
+      });
+    });
+
+    validateSlide('Social Proof', [
+      { name: 'hero quote', y: 1.14, h: 1.14 },
+      { name: 'secondary quotes', y: 2.70, h: 0.92 },
+      { name: 'third quote', y: 3.80, h: 0.82 },
+      { name: 'attribution 3', y: 4.64, h: 0.20 }
+    ]);
   }
 
-  // ── SLIDE 9: INVESTMENT + NEXT STEPS ────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // SLIDE 9 — INVESTMENT + NEXT STEPS
+  // Layout: left 52% pricing table, right 44% next steps — the one split slide
+  // ════════════════════════════════════════════════════════════════════════════
   {
     const s = prs.addSlide();
     s.background = { color: WHITE };
-    addContentChrome(s, prs, 9, 'YOUR INVESTMENT & NEXT STEPS');
+    addChrome(s, prs, 9, 'YOUR INVESTMENT & NEXT STEPS');
 
-    // Left half
+    const LH = 4.92;   // left half width
+    const RX9 = 5.20;  // right half x start
+    const RW9 = RM - RX9;  // 4.40"
+
+    // ── LEFT HALF ──
     s.addText('YOUR INVESTMENT', {
-      x: 0.5, y: 0.28, w: 4.3, h: 0.20, fontSize: 7, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 3.5
+      x: LM, y: 0.26, w: LH, h: 0.20,
+      fontSize: 7, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 3.5
     });
     s.addText('$1,000', {
-      x: 0.5, y: 0.48, w: 4.3, h: 0.96, fontSize: 56, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: LM, y: 0.46, w: LH, h: 1.00,
+      fontSize: 58, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
     s.addText('per month  ·  $12,000 annually  ·  Month-to-Month  ·  30-Day Notice', {
-      x: 0.5, y: 1.44, w: 4.3, h: 0.22, fontSize: 9.5, color: MGRAY, fontFace: 'Calibri'
+      x: LM, y: 1.46, w: LH, h: 0.24,
+      fontSize: 9.5, color: MGRAY, fontFace: 'Calibri'
     });
-
-    hairline(s, 0.5, 1.72, 4.3);
+    hl(s, LM, 1.76, LH);
 
     const items = [
-      { label: 'Labor — W-2 Employees',        value: '$630',     color: null },
-      { label: 'Supplies & Consumables (4%)',   value: '$40',      color: null },
-      { label: 'Equipment & Maintenance (3%)',  value: '$30',      color: null },
-      { label: 'QA Inspection Reports',         value: 'Included', color: GREEN },
-      { label: 'Dedicated QA Manager',          value: 'Included', color: GREEN },
-      { label: 'Ownership Direct Line',         value: 'Included', color: GREEN },
+      { label: 'Labor — W-2 Employees',       value: '$630',     green: false },
+      { label: 'Supplies & Consumables (4%)', value: '$40',      green: false },
+      { label: 'Equipment & Maintenance (3%)', value: '$30',      green: false },
+      { label: 'QA Inspection Reports',       value: 'Included', green: true  },
+      { label: 'Dedicated QA Manager',        value: 'Included', green: true  },
+      { label: 'Ownership Direct Line',       value: 'Included', green: true  },
     ];
-
+    const ITEM_H = 0.38;
     items.forEach((item, i) => {
-      const iy = 1.82 + i * 0.36;
-      const rowBg = i % 2 === 0 ? WHITE : 'F4F7FB';
-      s.addShape('rect', { x: 0.48, y: iy, w: 4.32, h: 0.32, fill: { color: rowBg }, line: { color: rowBg } });
-      s.addText(item.label, { x: 0.58, y: iy + 0.06, w: 2.9, h: 0.22, fontSize: 10, color: MGRAY, fontFace: 'Calibri' });
-      s.addText(item.value, { x: 3.5, y: iy + 0.06, w: 1.2, h: 0.22, fontSize: 10, bold: true, color: item.color || DKGRAY, fontFace: 'Calibri', align: 'right' });
+      const iy = 1.84 + i * ITEM_H;
+      const bg = i % 2 === 0 ? WHITE : 'F4F7FB';
+      s.addShape('rect', { x: LM - 0.02, y: iy, w: LH + 0.04, h: ITEM_H, fill: { color: bg }, line: { color: bg } });
+      s.addText(item.label, {
+        x: LM + 0.10, y: iy + 0.08, w: LH - 1.4, h: 0.24,
+        fontSize: 10, color: MGRAY, fontFace: 'Calibri'
+      });
+      s.addText(item.value, {
+        x: LM + LH - 1.35, y: iy + 0.08, w: 1.25, h: 0.24,
+        fontSize: 10, bold: true, color: item.green ? GREEN : DKGRAY,
+        fontFace: 'Calibri', align: 'right'
+      });
     });
 
-    const totalY = 1.82 + items.length * 0.36 + 0.08;
-    s.addShape('rect', { x: 0.48, y: totalY, w: 4.32, h: 0.42, fill: { color: NAVY }, line: { color: NAVY } });
-    s.addText('Monthly Total', { x: 0.60, y: totalY + 0.10, w: 2.4, h: 0.24, fontSize: 11, color: WHITE, fontFace: 'Trebuchet MS', bold: true });
-    s.addText('$1,000', { x: 2.8, y: totalY + 0.10, w: 1.9, h: 0.24, fontSize: 11, bold: true, color: GOLD, fontFace: 'Trebuchet MS', align: 'right' });
+    const totY = 1.84 + items.length * ITEM_H + 0.06;
+    s.addShape('rect', { x: LM - 0.02, y: totY, w: LH + 0.04, h: 0.44, fill: { color: NAVY }, line: { color: NAVY } });
+    s.addText('Monthly Total', {
+      x: LM + 0.10, y: totY + 0.10, w: LH - 1.8, h: 0.26,
+      fontSize: 12, bold: true, color: WHITE, fontFace: 'Trebuchet MS'
+    });
+    s.addText('$1,000', {
+      x: LM + LH - 1.6, y: totY + 0.10, w: 1.5, h: 0.26,
+      fontSize: 12, bold: true, color: GOLD, fontFace: 'Trebuchet MS', align: 'right'
+    });
 
-    vline(s, 5.02, 0.24, 5.15);
+    vl(s, RX9 - 0.12, 0.22, 5.00);
 
-    // Right half
+    // ── RIGHT HALF ──
     s.addText('READY TO MOVE FORWARD?', {
-      x: 5.22, y: 0.28, w: 4.5, h: 0.20, fontSize: 7, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 3.5
+      x: RX9, y: 0.26, w: RW9, h: 0.20,
+      fontSize: 7, bold: true, color: LGRAY, fontFace: 'Calibri', charSpacing: 3.5
     });
     s.addText('What happens when you say yes:', {
-      x: 5.22, y: 0.50, w: 4.5, h: 0.52, fontSize: 20, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
+      x: RX9, y: 0.48, w: RW9, h: 0.56,
+      fontSize: 20, bold: true, color: NAVY, fontFace: 'Trebuchet MS', wrap: true
     });
 
     const steps = [
       'Agreement signed & start date confirmed',
-      'CEO + QA Manager schedule site walkthrough',
+      'CEO + QA Manager schedule facility site walk',
       'Team assigned, keys exchanged, supplies staged',
-      'QA inspection account created — you get dashboard access',
+      'Inspection dashboard created — you get login access',
       'First service delivered on your start date, July 1',
     ];
+    const STEP_H = 0.58;
     steps.forEach((step, i) => {
-      const sy = 1.14 + i * 0.56;
-      s.addText(String(i + 1), { x: 5.22, y: sy, w: 0.32, h: 0.32, fontSize: 15, bold: true, color: GOLD, fontFace: 'Trebuchet MS' });
-      hairline(s, 5.22, sy + 0.36, 0.32, GOLD);
-      s.addText(step, { x: 5.64, y: sy + 0.05, w: 4.0, h: 0.36, fontSize: 10.5, color: MGRAY, fontFace: 'Calibri', wrap: true });
+      const sy = 1.14 + i * STEP_H;
+      s.addText(String(i + 1), {
+        x: RX9, y: sy, w: 0.34, h: 0.34,
+        fontSize: 16, bold: true, color: GOLD, fontFace: 'Trebuchet MS'
+      });
+      hl(s, RX9, sy + 0.38, 0.34, GOLD);
+      s.addText(step, {
+        x: RX9 + 0.44, y: sy + 0.04, w: RW9 - 0.44, h: 0.42,
+        fontSize: 11, color: MGRAY, fontFace: 'Calibri', wrap: true
+      });
     });
 
-    hairline(s, 5.22, 4.00, 4.5);
-    s.addText('Hereford Johnson', { x: 5.22, y: 4.10, w: 4.5, h: 0.30, fontSize: 13, bold: true, color: NAVY, fontFace: 'Trebuchet MS' });
-    s.addText('623-321-2542  ·  office@maddogcleaning.com', {
-      x: 5.22, y: 4.40, w: 4.5, h: 0.24, fontSize: 10, color: MGRAY, fontFace: 'Calibri'
+    hl(s, RX9, 4.08, RW9);
+    s.addText('Hereford Johnson', {
+      x: RX9, y: 4.18, w: RW9, h: 0.30,
+      fontSize: 13, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
+    s.addText('623-321-2542  ·  office@maddogcleaning.com', {
+      x: RX9, y: 4.50, w: RW9, h: 0.24,
+      fontSize: 10.5, color: MGRAY, fontFace: 'Calibri'
+    });
+
+    validateSlide('Investment', [
+      { name: 'price', y: 0.46, h: 1.00 },
+      { name: 'line items', y: 1.84, h: items.length * ITEM_H },
+      { name: 'total bar', y: totY, h: 0.44 },
+      { name: 'steps', y: 1.14, h: steps.length * STEP_H },
+      { name: 'contact', y: 4.50, h: 0.24 }
+    ]);
   }
 
   await prs.writeFile({ fileName: 'MDF_Proposal_LogicalSystems_2026-05-28.pptx' });
-  console.log('Presentation saved: MDF_Proposal_LogicalSystems_2026-05-28.pptx');
+  console.log('Saved: MDF_Proposal_LogicalSystems_2026-05-28.pptx');
 }
 
-buildProposal().catch(err => { console.error(err); process.exit(1); });
+build().catch(err => { console.error(err); process.exit(1); });
