@@ -411,7 +411,7 @@ async function buildProposal() {
     s.addText('$1,000', {
       x: 0.5, y: 0.52, w: 4.2, h: 0.90, fontSize: 52, bold: true, color: NAVY, fontFace: 'Trebuchet MS'
     });
-    s.addText('per month  ·  $12,000 annually  ·  Month-to-Month', {
+    s.addText('per month  ·  $12,000 annually  ·  Month-to-Month  ·  30-Day Notice', {
       x: 0.5, y: 1.42, w: 4.2, h: 0.22, fontSize: 9.5, color: MGRAY, fontFace: 'Calibri'
     });
 
