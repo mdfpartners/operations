@@ -694,14 +694,13 @@ async function build() {
     hRule(pres, s, 0.45, 1.90, 5.0);
 
     const lineItems = [
-      { label: 'Labor — W-2 Employees',       val: `$${LABOR.toLocaleString()}`,    green: false },
-      { label: 'Supplies & Consumables (4%)', val: `$${SUPPLIES.toLocaleString()}`, green: false },
-      { label: 'Equipment & Maintenance (3%)', val: `$${EQUIP.toLocaleString()}`,    green: false },
-      { label: 'OrangeQC Reporting',           val: 'Included',                       green: true  },
-      { label: 'Dedicated QA Manager',         val: 'Included',                       green: true  },
-      { label: 'Ownership Direct Line',        val: 'Included',                       green: true  },
+      { label: 'OrangeQC Inspection Reporting', val: 'Included', green: true  },
+      { label: 'Dedicated QA Manager',          val: 'Included', green: true  },
+      { label: 'Ownership Direct Line',         val: 'Included', green: true  },
+      { label: 'W-2 Employed Staff',            val: 'Included', green: true  },
+      { label: 'Supply & Equipment Management', val: 'Included', green: true  },
     ];
-    const liH = 0.38;
+    const liH = 0.42;
     lineItems.forEach((li, i) => {
       const ly = 2.00 + i * liH;
       s.addShape('rect', {
