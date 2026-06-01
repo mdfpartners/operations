@@ -1,39 +1,22 @@
-"""Rebuild all summary tabs from Raw Data.
-
-Called automatically by sync.py after each Raw Data update.  All summary tabs
-are fully recomputed from scratch so they stay in sync with Raw Data with no
-manual intervention needed.
-
-Tab layout
-----------
-Daily           – Customer × calendar-date grid (M/D column headers)
-Weekly          – Customer × Saturday-to-Friday week
-Monthly         – Customer × month (Jan 2026, …)
-By Employee     – (Customer, Employee) × month, with "— All —" rollup rows
-Recent (2 Weeks)– Customer × last-14-days daily grid
-Weekly Variance – Customer × week, showing actual − expected_per_week
-Monthly Variance– Customer × month, showing actual − expected_per_month
-"""
+"""Rebuild all summary tabs from Raw Data."""
 
 from __future__ import annotations
 
+import time
 from collections import defaultdict
 from datetime import date, timedelta
 from typing import Any
 
 from onedrive import OneDriveClient
 
-# ── date helpers ──────────────────────────────────────────────────────────────
 
 def _d(val: Any) -> date:
-    """Parse a date value that may be an ISO string or an Excel serial number."""
     if isinstance(val, (int, float)) and val > 40000:
         return date(1899, 12, 30) + timedelta(days=int(val))
     return date.fromisoformat(str(val))
 
 
 def _month_key(d: date) -> int:
-    """Ordinal month index (unique per year-month)."""
     return d.year * 12 + d.month - 1
 
 
@@ -42,7 +25,6 @@ def _month_key_to_date(key: int) -> date:
 
 
 def _week_start(d: date) -> date:
-    """Saturday that opens the Saturday-to-Friday week containing d."""
     return d - timedelta(days=(d.weekday() - 5) % 7)
 
 
@@ -59,15 +41,16 @@ def _month_label(d: date) -> str:
     return d.strftime("%b %Y")
 
 
-# ── Raw Data reader ───────────────────────────────────────────────────────────
+def _r(val: float) -> Any:
+    v = round(val, 2)
+    return v if v else ""
+
 
 def read_raw_data(od: OneDriveClient, user_id: str, item_id: str) -> list[dict]:
-    """Return all rows from the Raw Data sheet as a list of dicts."""
     used = od.get_used_range(user_id, item_id, "Raw Data")
     all_rows = used.get("values", [])
-
     rows: list[dict] = []
-    for row in all_rows[1:]:   # row 0 is the header
+    for row in all_rows[1:]:
         if not row or not row[0]:
             continue
         rows.append({
@@ -79,15 +62,12 @@ def read_raw_data(od: OneDriveClient, user_id: str, item_id: str) -> list[dict]:
     return rows
 
 
-# ── expected-hours reader (preserves col-B values on variance tabs) ───────────
-
 def read_expected(
     od: OneDriveClient,
     user_id: str,
     item_id: str,
     sheet_name: str,
 ) -> dict[str, float]:
-    """Return {customer: expected_value} from column B of a variance sheet."""
     used = od.get_used_range(user_id, item_id, sheet_name)
     result: dict[str, float] = {}
     for row in used.get("values", [])[1:]:
@@ -99,14 +79,6 @@ def read_expected(
             except (ValueError, TypeError):
                 pass
     return result
-
-
-# ── table builders ────────────────────────────────────────────────────────────
-
-def _r(val: float) -> Any:
-    """Round to 2 dp; return '' for zero so cells stay clean."""
-    v = round(val, 2)
-    return v if v else ""
 
 
 def build_daily(rows: list[dict]) -> list[list]:
@@ -257,10 +229,7 @@ def build_recent(rows: list[dict], window_days: int = 14) -> list[list]:
     return out
 
 
-def build_weekly_variance(
-    rows: list[dict],
-    expected_weekly: dict[str, float],
-) -> list[list]:
+def build_weekly_variance(rows: list[dict], expected_weekly: dict[str, float]) -> list[list]:
     customers   = sorted({r["jobcode"] for r in rows if r["jobcode"]})
     week_starts = sorted({_week_start(_d(r["date"])) for r in rows})
 
@@ -288,17 +257,11 @@ def build_weekly_variance(
                 col_totals[i] += actual
         out.append(row)
 
-    out.append(
-        ["TOTAL", _r(total_exp)]
-        + [_r(t) for t in col_totals]
-    )
+    out.append(["TOTAL", _r(total_exp)] + [_r(t) for t in col_totals])
     return out
 
 
-def build_monthly_variance(
-    rows: list[dict],
-    expected_monthly: dict[str, float],
-) -> list[list]:
+def build_monthly_variance(rows: list[dict], expected_monthly: dict[str, float]) -> list[list]:
     customers = sorted({r["jobcode"] for r in rows if r["jobcode"]})
     months    = sorted({_month_key(_d(r["date"])) for r in rows})
 
@@ -327,14 +290,9 @@ def build_monthly_variance(
                 col_totals[i] += actual
         out.append(row)
 
-    out.append(
-        ["TOTAL", _r(total_exp)]
-        + [_r(t) for t in col_totals]
-    )
+    out.append(["TOTAL", _r(total_exp)] + [_r(t) for t in col_totals])
     return out
 
-
-# ── main entry point ──────────────────────────────────────────────────────────
 
 def rebuild_summaries(
     od: OneDriveClient,
@@ -342,12 +300,6 @@ def rebuild_summaries(
     item_id: str,
     rows: list[dict] | None = None,
 ) -> None:
-    """Recompute and overwrite every summary tab from Raw Data.
-
-    If *rows* is supplied the Raw Data sheet is not re-read (avoids a stale
-    Graph API response immediately after a write).
-    """
-
     if rows is None:
         print("[summaries] Reading Raw Data …")
         rows = read_raw_data(od, user_id, item_id)
@@ -358,7 +310,6 @@ def rebuild_summaries(
         return
     print(f"[summaries] {len(rows)} rows loaded.")
 
-    # Preserve expected-hours columns before overwriting variance tabs
     print("[summaries] Reading expected hours …")
     exp_weekly  = read_expected(od, user_id, item_id, "Weekly Variance")
     exp_monthly = read_expected(od, user_id, item_id, "Monthly Variance")
@@ -380,6 +331,15 @@ def rebuild_summaries(
         nrows = len(table)
         ncols = len(table[0]) if table else 0
         print(f"[summaries] Writing '{sheet}' ({nrows} rows × {ncols} cols) …")
-        od.rewrite_sheet(user_id, item_id, sheet, table)
+        for attempt in range(5):
+            try:
+                od.rewrite_sheet(user_id, item_id, sheet, table)
+                break
+            except Exception as exc:
+                if attempt == 4:
+                    raise
+                wait = 2 ** (attempt + 1)
+                print(f"[summaries] Retrying '{sheet}' in {wait}s ({exc}) …")
+                time.sleep(wait)
 
     print("[summaries] All summary tabs updated.")
