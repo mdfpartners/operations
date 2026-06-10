@@ -3,7 +3,6 @@ import { patients } from './data/patients'
 import PatientList from './components/PatientList'
 import ClaimCard from './components/ClaimCard'
 import VickiResponse from './components/VickiResponse'
-import BreakdownChart from './components/BreakdownChart'
 
 export default function App() {
   const [selectedPatient, setSelectedPatient] = useState(patients[0])
@@ -111,9 +110,9 @@ export default function App() {
           {selectedPatient && (
             <>
               <ClaimCard patient={selectedPatient} />
-              <BreakdownChart claim={selectedPatient.claim} />
               <VickiResponse
                 demoMode={demoMode}
+                claim={selectedPatient.claim}
                 response={response}
                 loading={loading}
                 error={error}

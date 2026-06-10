@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import BreakdownChart from './BreakdownChart'
 
 const sections = [
   { key: 'greeting', label: null, bg: 'bg-white' },
@@ -8,13 +9,28 @@ const sections = [
   { key: 'signoff', label: null, bg: 'bg-white' },
 ]
 
-function formatAsPlainText(response) {
+function formatClaimAsText(claim) {
+  if (!claim) return ''
+  const pad = (label) => label.padEnd(18)
+  return [
+    '--- CLAIM BREAKDOWN ---',
+    `${pad('Amount Billed:')} $${claim.amountBilled.toLocaleString()}`,
+    `${pad('Allowed Amount:')} $${claim.allowedAmount.toLocaleString()}`,
+    `${pad('Insurance Paid:')} $${claim.insurancePaid.toLocaleString()}`,
+    `${pad('Your Balance:')} $${claim.patientOwes.toLocaleString()}`,
+    '-----------------------',
+  ].join('\n')
+}
+
+function formatAsPlainText(response, claim) {
   if (!response) return ''
   return [
     response.greeting,
     '',
     'WHY YOU OWE THIS',
     response.why_you_owe,
+    '',
+    formatClaimAsText(claim),
     '',
     'WHAT THIS MEANS',
     response.what_this_means,
@@ -29,21 +45,18 @@ function formatAsPlainText(response) {
   ].join('\n')
 }
 
-export default function VickiResponse({ demoMode, response, loading, error, onGenerate }) {
-  const [editMode, setEditMode] = useState(false)
+export default function VickiResponse({ demoMode, claim, response, loading, error, onGenerate }) {
   const [editedText, setEditedText] = useState('')
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (response) {
-      setEditedText(formatAsPlainText(response))
-      setEditMode(false)
+      setEditedText(formatAsPlainText(response, claim))
     }
-  }, [response])
+  }, [response, claim])
 
   const handleCopy = async () => {
-    const text = editMode ? editedText : formatAsPlainText(response)
-    await navigator.clipboard.writeText(text)
+    await navigator.clipboard.writeText(editedText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -56,24 +69,16 @@ export default function VickiResponse({ demoMode, response, loading, error, onGe
           <p className="text-xs text-gray-400 mt-0.5">AI-generated billing explanation</p>
         </div>
         {response && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setEditMode((e) => !e)}
-              className="text-xs px-3 py-1.5 rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              {editMode ? 'View formatted' : 'Edit'}
-            </button>
-            <button
-              onClick={handleCopy}
-              className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
-                copied
-                  ? 'bg-green-100 text-green-700 border border-green-200'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
-              }`}
-            >
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
-          </div>
+          <button
+            onClick={handleCopy}
+            className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
+              copied
+                ? 'bg-green-100 text-green-700 border border-green-200'
+                : 'bg-indigo-600 text-white hover:bg-indigo-700'
+            }`}
+          >
+            {copied ? 'Copied!' : 'Copy for email'}
+          </button>
         )}
       </div>
 
@@ -121,49 +126,61 @@ export default function VickiResponse({ demoMode, response, loading, error, onGe
 
         {response && (
           <>
-            {editMode ? (
+            {/* Formatted preview */}
+            <div className="space-y-3">
+              {sections.map(({ key, label, bg }) => (
+                <div key={key} className={`rounded-lg p-4 ${bg}`}>
+                  {label && (
+                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                      {label}
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-800 leading-relaxed">{response[key]}</p>
+                  {key === 'why_you_owe' && claim && (
+                    <div className="mt-4">
+                      <BreakdownChart claim={claim} />
+                    </div>
+                  )}
+                </div>
+              ))}
+              <div className="pt-1 flex items-center gap-1.5 text-xs text-gray-400">
+                <span className="w-4 h-4 bg-indigo-600 rounded flex items-center justify-center">
+                  <span className="text-white font-bold" style={{ fontSize: '9px' }}>V</span>
+                </span>
+                Vicki, Billing Support
+              </div>
+            </div>
+
+            {/* Editable email text */}
+            <div className="mt-5 pt-5 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Edit before sending
+                </p>
+                <button
+                  onClick={handleCopy}
+                  className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
+                    copied
+                      ? 'bg-green-100 text-green-700 border border-green-200'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  }`}
+                >
+                  {copied ? 'Copied!' : 'Copy for email'}
+                </button>
+              </div>
               <textarea
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
                 className="w-full h-72 text-sm text-gray-700 border border-gray-200 rounded-lg p-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-300 font-mono"
               />
-            ) : (
-              <div className="space-y-3">
-                {sections.map(({ key, label, bg }) => (
-                  <div key={key} className={`rounded-lg p-4 ${bg}`}>
-                    {label && (
-                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-                        {label}
-                      </p>
-                    )}
-                    <p className="text-sm text-gray-800 leading-relaxed">{response[key]}</p>
-                  </div>
-                ))}
-                <div className="pt-1 flex items-center gap-1.5 text-xs text-gray-400">
-                  <span className="w-4 h-4 bg-indigo-600 rounded flex items-center justify-center">
-                    <span className="text-white font-bold" style={{ fontSize: '9px' }}>V</span>
-                  </span>
-                  Vicki, Billing Support
-                </div>
-              </div>
-            )}
+            </div>
 
-            <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+            <div className="mt-3 flex justify-start">
               <button
                 onClick={onGenerate}
                 className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
               >
                 {demoMode ? 'Reload demo response' : 'Regenerate'}
-              </button>
-              <button
-                onClick={handleCopy}
-                className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
-                  copied
-                    ? 'bg-green-100 text-green-700 border border-green-200'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                }`}
-              >
-                {copied ? 'Copied!' : 'Copy for email'}
               </button>
             </div>
           </>
