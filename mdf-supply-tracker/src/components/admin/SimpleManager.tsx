@@ -13,6 +13,7 @@ interface Field {
 interface Column {
   key: string
   label: string
+  type?: 'url'
   render?: (value: any, row: any) => React.ReactNode
 }
 
@@ -133,7 +134,7 @@ export default function SimpleManager({ title, items, apiBase, fields, columns }
               <tr key={item.id} className={item.active ? '' : 'opacity-50'}>
                 {columns.map((c) => (
                   <td key={c.key} className="px-4 py-3 text-gray-700">
-                    {c.render ? c.render(item[c.key], item) : item[c.key] || '—'}
+                    {c.render ? c.render(item[c.key], item) : c.type === 'url' && item[c.key] ? <a href={item[c.key]} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">{item[c.key]}</a> : item[c.key] || '—'}
                   </td>
                 ))}
                 <td className="px-4 py-3">
