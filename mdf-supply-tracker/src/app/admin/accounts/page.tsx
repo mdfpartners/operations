@@ -18,7 +18,7 @@ export default async function AccountsPage() {
       ]}
       columns={[
         { key: 'name', label: 'Name' },
-        { key: 'location', label: 'Location', render: (v: string) => v || '—' },
+        { key: 'location', label: 'Location' },
       ]}
     />
   )

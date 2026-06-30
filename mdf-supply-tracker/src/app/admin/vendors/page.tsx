@@ -18,7 +18,7 @@ export default async function VendorsPage() {
       ]}
       columns={[
         { key: 'name', label: 'Name' },
-        { key: 'website', label: 'Website', render: (v: string) => v ? <a href={v} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">{v}</a> : '—' },
+        { key: 'website', label: 'Website', type: 'url' },
       ]}
     />
   )
