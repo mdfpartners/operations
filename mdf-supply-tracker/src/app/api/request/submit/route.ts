@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid urgency value' }, { status: 400 })
   }
 
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
 
   // Validate token — server-side
   const { data: requester } = await supabase

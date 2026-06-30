@@ -4,7 +4,7 @@ import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import RequesterManager from '@/components/admin/RequesterManager'
 
 export default async function RequestersPage() {
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
 
   const { data: requesters } = await supabase
     .from('app_users')

@@ -7,7 +7,7 @@ import type { OrderStatus } from '@/types'
 import Link from 'next/link'
 
 export default async function ReportsPage() {
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
 
   const { data: orders } = await supabase
     .from('supply_requests')
