@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const { type, rows, fileName }: { type: ImportType; rows: PreviewRow[]; fileName: string } =
     await request.json()
 
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
   const importable = rows.filter((r) => r.action !== 'rejected')
   const rejected = rows.filter((r) => r.action === 'rejected')
   const duplicateCount = rejected.filter((r) =>

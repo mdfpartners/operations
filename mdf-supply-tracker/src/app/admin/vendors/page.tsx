@@ -4,7 +4,7 @@ import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import SimpleManager from '@/components/admin/SimpleManager'
 
 export default async function VendorsPage() {
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
   const { data: vendors } = await supabase.from('vendors').select('*').order('name')
   return (
     <SimpleManager

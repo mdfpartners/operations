@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
   if (!rows?.length) return NextResponse.json({ rows: [] })
 
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
 
   // Load existing records for match detection
   let existing: Record<string, unknown>[] = []

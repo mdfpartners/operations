@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
 
   const tz = process.env.APP_TIMEZONE || 'America/Chicago'
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
 
   const { data: orders } = await supabase
     .from('supply_requests')
