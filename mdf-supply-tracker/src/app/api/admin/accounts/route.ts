@@ -4,7 +4,7 @@ import { createSupabaseServiceClient } from '@/lib/supabase/server'
 export async function POST(request: NextRequest) {
   const { name, location, active } = await request.json()
   if (!name?.trim()) return NextResponse.json({ error: 'Account name is required' }, { status: 400 })
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
   const { data, error } = await supabase.from('accounts').insert({
     name: name.trim(),
     location: location?.trim() || null,

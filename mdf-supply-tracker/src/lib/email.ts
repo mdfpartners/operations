@@ -23,7 +23,7 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail(opts: SendEmailOptions): Promise<void> {
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
 
   if (!shouldSendRealEmails()) {
     console.log('[DEV EMAIL]', { to: opts.to, subject: opts.subject, html: opts.html })

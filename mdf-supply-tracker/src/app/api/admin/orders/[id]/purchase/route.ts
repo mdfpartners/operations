@@ -30,7 +30,7 @@ export async function POST(request: NextRequest, { params }: Context) {
     return NextResponse.json({ error: 'Total cost must be >= 0' }, { status: 400 })
   }
 
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
 
   // Verify line item belongs to this order
   const { data: lineItem } = await supabase

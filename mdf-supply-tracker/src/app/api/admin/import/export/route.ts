@@ -17,7 +17,7 @@ function toCSV(headers: string[], rows: string[][]): string {
 
 export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get('type') as ExportType
-  const supabase = createSupabaseServiceClient()
+  const supabase = await createSupabaseServiceClient()
 
   let csv = ''
   let filename = `mdf_${type}_export.csv`
