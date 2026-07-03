@@ -106,6 +106,18 @@ export default function RequestForm({ requester, accounts, catalogItems, token }
         <p className="text-gray-500 text-sm mt-4">
           You will receive an email confirmation if an email address is on file.
         </p>
+        <button
+          onClick={() => {
+            setOrderNumber(null)
+            setLineItems([{ ...EMPTY_LINE }])
+            setNotes('')
+            setUrgency('')
+            setErrors({})
+          }}
+          className="mt-6 text-blue-600 hover:text-blue-800 text-sm font-medium underline underline-offset-2"
+        >
+          Submit another request
+        </button>
       </div>
     )
   }

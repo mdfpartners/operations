@@ -15,7 +15,7 @@ export default async function RequestersPage() {
     .order('name')
 
   const { data: accounts } = await supabase.from('accounts').select('id, name').eq('active', true).order('name')
-  const baseUrl = process.env.APP_BASE_URL || ''
+  const baseUrl = process.env.APP_BASE_URL || 'https://operations-black-sigma.vercel.app'
 
   return (
     <RequesterManager
