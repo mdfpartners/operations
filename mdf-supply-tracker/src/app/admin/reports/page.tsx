@@ -6,10 +6,18 @@ import { STATUS_LABELS, OPEN_STATUSES } from '@/lib/constants'
 import type { OrderStatus } from '@/types'
 import Link from 'next/link'
 
-export default async function ReportsPage() {
+interface ReportsPageProps {
+  searchParams: Promise<{ from?: string; to?: string }>
+}
+
+export default async function ReportsPage({ searchParams }: ReportsPageProps) {
+  const sp = await searchParams
+  const fromDate = sp.from || ''
+  const toDate = sp.to || ''
+
   const supabase = await createSupabaseServiceClient()
 
-  const { data: orders } = await supabase
+  let ordersQuery = supabase
     .from('supply_requests')
     .select(`
       id, order_number, status, urgency, submitted_at, completed_at, cancelled_at,
@@ -20,6 +28,10 @@ export default async function ReportsPage() {
         supply_catalog(item_name, category)
       )
     `)
+  if (fromDate) ordersQuery = ordersQuery.gte('submitted_at', fromDate)
+  if (toDate) ordersQuery = ordersQuery.lte('submitted_at', toDate + 'T23:59:59')
+
+  const { data: orders } = await ordersQuery
 
   const all: any[] = orders || []
   const open = all.filter((o) => OPEN_STATUSES.includes(o.status as OrderStatus))
@@ -110,6 +122,37 @@ export default async function ReportsPage() {
         <h1 className="text-xl font-bold text-gray-900">Reports</h1>
         <a href="/api/admin/reports/export-orders" className="text-sm text-blue-600 hover:underline">Export order history (CSV)</a>
       </div>
+
+      {/* Date range filter */}
+      <form method="GET" className="flex flex-wrap items-end gap-3 bg-white rounded-lg shadow-sm p-4">
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">From</label>
+          <input
+            type="date"
+            name="from"
+            defaultValue={fromDate}
+            className="border border-gray-300 rounded px-2 py-1.5 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">To</label>
+          <input
+            type="date"
+            name="to"
+            defaultValue={toDate}
+            className="border border-gray-300 rounded px-2 py-1.5 text-sm"
+          />
+        </div>
+        <button type="submit" className="bg-gray-800 text-white px-3 py-1.5 rounded text-sm">Apply</button>
+        {(fromDate || toDate) && (
+          <a href="/admin/reports" className="text-sm text-gray-500 hover:text-gray-700 py-1.5">Clear</a>
+        )}
+        {(fromDate || toDate) && (
+          <span className="text-xs text-blue-700 py-1.5">
+            Showing {fromDate || 'all time'} &rarr; {toDate || 'today'}
+          </span>
+        )}
+      </form>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

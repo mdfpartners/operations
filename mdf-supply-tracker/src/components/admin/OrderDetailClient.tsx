@@ -142,7 +142,7 @@ export default function OrderDetailClient({ order, agingBucket, daysOutstanding,
           </span>
         </div>
         <div><p className="text-xs text-gray-500">Submitted</p>
-          <p>{new Date(order.submitted_at).toLocaleString('en-US', { timeZone: process.env.NEXT_PUBLIC_APP_TIMEZONE || 'America/Chicago' })}</p>
+          <p>{new Date(order.submitted_at).toLocaleString('en-US', { timeZone: 'America/Chicago' })}</p>
         </div>
         <div><p className="text-xs text-gray-500">Days Outstanding</p><p className="font-medium">{daysOutstanding}</p></div>
         <div><p className="text-xs text-gray-500">Requester Notes</p><p>{order.requester_notes || '—'}</p></div>
