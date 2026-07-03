@@ -51,7 +51,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
     const totalCost = lineItems
       .flatMap((li) => li.purchase_details)
       .reduce((sum, pd) => sum + (pd?.total_cost || 0), 0)
-    return { ...o, agingBucket, totalCost: totalCost > 0 ? totalCost : null }
+    return { ...o, agingBucket, totalCost: totalCost > 0 ? totalCost : null, itemCount: lineItems.length }
   })
 
   const filteredRows = sp.aging ? rows.filter((r: any) => r.agingBucket === sp.aging) : rows
@@ -108,6 +108,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Aging</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Urgency</th>
+                  <th className="text-center px-4 py-3 font-medium text-gray-600">Items</th>
                   <th className="text-right px-4 py-3 font-medium text-gray-600">Total Cost</th>
                 </tr>
               </thead>
@@ -144,6 +145,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                           {URGENCY_LABELS[o.urgency as UrgencyLevel]}
                         </span>
                       </td>
+                      <td className="px-4 py-3 text-center text-gray-500 text-sm">{o.itemCount}</td>
                       <td className="px-4 py-3 text-right text-gray-700">
                         {o.totalCost != null ? `$${o.totalCost.toFixed(2)}` : '—'}
                       </td>
