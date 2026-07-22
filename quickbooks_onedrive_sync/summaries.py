@@ -81,13 +81,14 @@ def read_expected(
     return result
 
 
-def build_daily(rows: list[dict]) -> list[list]:
+def build_daily(rows: list[dict], exclude: set[str] | None = None) -> list[list]:
+    excl      = exclude or set()
     dates     = sorted({r["date"] for r in rows})
-    customers = sorted({r["jobcode"] for r in rows if r["jobcode"]})
+    customers = sorted({r["jobcode"] for r in rows if r["jobcode"] and r["jobcode"] not in excl})
 
     data: dict[tuple, float] = defaultdict(float)
     for r in rows:
-        if r["jobcode"]:
+        if r["jobcode"] and r["jobcode"] not in excl:
             data[(r["jobcode"], r["date"])] += r["hours"]
 
     header = ["Customer"] + [_daily_label(_d(d)) for d in dates]
@@ -106,13 +107,14 @@ def build_daily(rows: list[dict]) -> list[list]:
     return out
 
 
-def build_weekly(rows: list[dict]) -> list[list]:
-    customers   = sorted({r["jobcode"] for r in rows if r["jobcode"]})
+def build_weekly(rows: list[dict], exclude: set[str] | None = None) -> list[list]:
+    excl        = exclude or set()
+    customers   = sorted({r["jobcode"] for r in rows if r["jobcode"] and r["jobcode"] not in excl})
     week_starts = sorted({_week_start(_d(r["date"])) for r in rows})
 
     data: dict[tuple, float] = defaultdict(float)
     for r in rows:
-        if r["jobcode"]:
+        if r["jobcode"] and r["jobcode"] not in excl:
             data[(r["jobcode"], _week_start(_d(r["date"])))] += r["hours"]
 
     header = ["Customer"] + [_week_label(ws) for ws in week_starts]
@@ -131,13 +133,14 @@ def build_weekly(rows: list[dict]) -> list[list]:
     return out
 
 
-def build_monthly(rows: list[dict]) -> list[list]:
-    customers = sorted({r["jobcode"] for r in rows if r["jobcode"]})
+def build_monthly(rows: list[dict], exclude: set[str] | None = None) -> list[list]:
+    excl      = exclude or set()
+    customers = sorted({r["jobcode"] for r in rows if r["jobcode"] and r["jobcode"] not in excl})
     months    = sorted({_month_key(_d(r["date"])) for r in rows})
 
     data: dict[tuple, float] = defaultdict(float)
     for r in rows:
-        if r["jobcode"]:
+        if r["jobcode"] and r["jobcode"] not in excl:
             data[(r["jobcode"], _month_key(_d(r["date"])))] += r["hours"]
 
     header = ["Customer"] + [_month_label(_month_key_to_date(m)) for m in months]
@@ -156,14 +159,15 @@ def build_monthly(rows: list[dict]) -> list[list]:
     return out
 
 
-def build_by_employee(rows: list[dict]) -> list[list]:
+def build_by_employee(rows: list[dict], exclude: set[str] | None = None) -> list[list]:
+    excl   = exclude or set()
     months = sorted({_month_key(_d(r["date"])) for r in rows})
 
     emp_data: dict[tuple, dict[int, float]] = defaultdict(lambda: defaultdict(float))
     emps_by_customer: dict[str, set[str]]   = defaultdict(set)
 
     for r in rows:
-        if not r["jobcode"]:
+        if not r["jobcode"] or r["jobcode"] in excl:
             continue
         m = _month_key(_d(r["date"]))
         emp_data[(r["jobcode"], r["user"])][m] += r["hours"]
@@ -199,18 +203,19 @@ def build_by_employee(rows: list[dict]) -> list[list]:
     return out
 
 
-def build_recent(rows: list[dict], window_days: int = 14) -> list[list]:
+def build_recent(rows: list[dict], window_days: int = 14, exclude: set[str] | None = None) -> list[list]:
+    excl   = exclude or set()
     cutoff = date.today() - timedelta(days=window_days)
     recent = [r for r in rows if _d(r["date"]) > cutoff]
     if not recent:
         return []
 
     dates     = sorted({r["date"] for r in recent})
-    customers = sorted({r["jobcode"] for r in recent if r["jobcode"]})
+    customers = sorted({r["jobcode"] for r in recent if r["jobcode"] and r["jobcode"] not in excl})
 
     data: dict[tuple, float] = defaultdict(float)
     for r in recent:
-        if r["jobcode"]:
+        if r["jobcode"] and r["jobcode"] not in excl:
             data[(r["jobcode"], r["date"])] += r["hours"]
 
     header = ["Customer"] + [_daily_label(_d(d)) for d in dates]
@@ -399,11 +404,11 @@ def rebuild_summaries(
     exp_daily = expected_daily or {}
 
     tables: dict[str, list[list]] = {
-        "Daily":            build_daily(rows),
-        "Weekly":           build_weekly(rows),
-        "Monthly":          build_monthly(rows),
-        "By Employee":      build_by_employee(rows),
-        "Recent (2 Weeks)": build_recent(rows),
+        "Daily":            build_daily(rows, exclude=excl),
+        "Weekly":           build_weekly(rows, exclude=excl),
+        "Monthly":          build_monthly(rows, exclude=excl),
+        "By Employee":      build_by_employee(rows, exclude=excl),
+        "Recent (2 Weeks)": build_recent(rows, exclude=excl),
         "Weekly Variance":  build_weekly_variance(rows, exp_weekly, exclude=excl),
         "Monthly Variance": build_monthly_variance(rows, exp_monthly, exclude=excl),
         "Daily Variance":   build_daily_variance(rows, exp_daily, expected_weekly=exp_weekly, exclude=excl),
