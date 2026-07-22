@@ -72,7 +72,7 @@ EXPECTED_DAILY: dict[str, dict[int, float]] = {
     "CTI":                             {1: 1.5                                       },
     "IUOE 649":                        {1: 1.7,  6: 1.7                             },
     "Metamora Christian Union Church": {3: 5.6                                       },
-    "Metamora Industries":             {1: 3.0,  3: 3.6                             },
+    "Metamora Industries":             {1: 5.5,  3: 5.5                             },
     "Midwest Multicare":               {6: 2.7                                       },
     "Morton Industries":               {1: 3.75, 4: 3.75                            },
     "Peoria Park District":            {1: 4.25, 4: 4.0                             },
