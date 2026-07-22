@@ -29,6 +29,37 @@ from summaries import rebuild_summaries, _d
 HEADER     = ["Date", "Customer", "Employee", "Hours"]
 SHEET_NAME = "Raw Data"
 
+EXPECTED_WEEKLY: dict[str, float] = {
+    "Accel Entertainment":                       11,
+    "Bethel Lutheran Church":                    42,
+    "Blunier Builders":                           4,
+    "CTI":                                        6,
+    "Contech Engineered Solutions":               6,
+    "Convergint Technologies":                    2.5,
+    "Emcor Facility Services":                    0.75,
+    "IDNR Region V Office":                       2.5,
+    "IUOE 649":                                   4,
+    "Johnson Controls":                           4.5,
+    "Metamora Christian Union Church":            5.5,
+    "Metamora Industries":                       13,
+    "Midwest Multicare":                          3,
+    "Morton Industries":                          8,
+    "Office/Management Time":                    15,
+    "Peoria County Veteran Assistance Commission": 1.8,
+    "Peoria Park District":                       7.5,
+    "Thermosystem, LLC":                          1.5,
+    "Troxell Ins. / Summer & Associates":         4,
+    "Winpak Heat Seal Corporation":              38,
+    "Woodford County Health Department":         13,
+    "Woodford County Sheriff's Office":          86.75,
+}
+
+EXPECTED_MONTHLY: dict[str, float] = {
+    k: round(v * 52 / 12, 2) for k, v in EXPECTED_WEEKLY.items()
+}
+
+EXCLUDE_CUSTOMERS: set[str] = {"Unknown", "Logan Correctional Center"}
+
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Sync QuickBooks Time → OneDrive Excel")
@@ -131,7 +162,10 @@ def main() -> None:
         parsed = _parse_for_summaries(existing_data)
         od.open_workbook_session(user_id, item_id)
         try:
-            rebuild_summaries(od, user_id, item_id, rows=parsed)
+            rebuild_summaries(od, user_id, item_id, rows=parsed,
+                              exp_weekly_override=EXPECTED_WEEKLY,
+                              exp_monthly_override=EXPECTED_MONTHLY,
+                              exclude_customers=EXCLUDE_CUSTOMERS)
         finally:
             od.close_workbook_session(user_id, item_id)
         return
@@ -147,7 +181,10 @@ def main() -> None:
     parsed = _parse_for_summaries(all_data)
     od.open_workbook_session(user_id, item_id)
     try:
-        rebuild_summaries(od, user_id, item_id, rows=parsed)
+        rebuild_summaries(od, user_id, item_id, rows=parsed,
+                          exp_weekly_override=EXPECTED_WEEKLY,
+                          exp_monthly_override=EXPECTED_MONTHLY,
+                          exclude_customers=EXCLUDE_CUSTOMERS)
     finally:
         od.close_workbook_session(user_id, item_id)
 

@@ -229,8 +229,13 @@ def build_recent(rows: list[dict], window_days: int = 14) -> list[list]:
     return out
 
 
-def build_weekly_variance(rows: list[dict], expected_weekly: dict[str, float]) -> list[list]:
-    customers   = sorted({r["jobcode"] for r in rows if r["jobcode"]})
+def build_weekly_variance(
+    rows: list[dict],
+    expected_weekly: dict[str, float],
+    exclude: set[str] | None = None,
+) -> list[list]:
+    excl = exclude or set()
+    customers   = sorted({r["jobcode"] for r in rows if r["jobcode"] and r["jobcode"] not in excl})
     week_starts = sorted({_week_start(_d(r["date"])) for r in rows})
 
     data: dict[tuple, float] = defaultdict(float)
@@ -261,8 +266,13 @@ def build_weekly_variance(rows: list[dict], expected_weekly: dict[str, float]) -
     return out
 
 
-def build_monthly_variance(rows: list[dict], expected_monthly: dict[str, float]) -> list[list]:
-    customers = sorted({r["jobcode"] for r in rows if r["jobcode"]})
+def build_monthly_variance(
+    rows: list[dict],
+    expected_monthly: dict[str, float],
+    exclude: set[str] | None = None,
+) -> list[list]:
+    excl = exclude or set()
+    customers = sorted({r["jobcode"] for r in rows if r["jobcode"] and r["jobcode"] not in excl})
     months    = sorted({_month_key(_d(r["date"])) for r in rows})
 
     data: dict[tuple, float] = defaultdict(float)
@@ -299,6 +309,9 @@ def rebuild_summaries(
     user_id: str,
     item_id: str,
     rows: list[dict] | None = None,
+    exp_weekly_override: dict[str, float] | None = None,
+    exp_monthly_override: dict[str, float] | None = None,
+    exclude_customers: set[str] | None = None,
 ) -> None:
     if rows is None:
         print("[summaries] Reading Raw Data …")
@@ -310,9 +323,20 @@ def rebuild_summaries(
         return
     print(f"[summaries] {len(rows)} rows loaded.")
 
-    print("[summaries] Reading expected hours …")
-    exp_weekly  = read_expected(od, user_id, item_id, "Weekly Variance")
-    exp_monthly = read_expected(od, user_id, item_id, "Monthly Variance")
+    if exp_weekly_override is not None:
+        exp_weekly = exp_weekly_override
+    else:
+        print("[summaries] Reading expected hours …")
+        exp_weekly = read_expected(od, user_id, item_id, "Weekly Variance")
+
+    if exp_monthly_override is not None:
+        exp_monthly = exp_monthly_override
+    else:
+        if exp_weekly_override is None:
+            print("[summaries] Reading expected monthly hours …")
+        exp_monthly = read_expected(od, user_id, item_id, "Monthly Variance")
+
+    excl = exclude_customers or set()
 
     tables: dict[str, list[list]] = {
         "Daily":            build_daily(rows),
@@ -320,8 +344,8 @@ def rebuild_summaries(
         "Monthly":          build_monthly(rows),
         "By Employee":      build_by_employee(rows),
         "Recent (2 Weeks)": build_recent(rows),
-        "Weekly Variance":  build_weekly_variance(rows, exp_weekly),
-        "Monthly Variance": build_monthly_variance(rows, exp_monthly),
+        "Weekly Variance":  build_weekly_variance(rows, exp_weekly, exclude=excl),
+        "Monthly Variance": build_monthly_variance(rows, exp_monthly, exclude=excl),
     }
 
     for sheet, table in tables.items():
