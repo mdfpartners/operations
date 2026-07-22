@@ -229,6 +229,55 @@ def build_recent(rows: list[dict], window_days: int = 14) -> list[list]:
     return out
 
 
+def build_daily_variance(
+    rows: list[dict],
+    expected_daily: dict[str, dict[int, float]],
+    exclude: set[str] | None = None,
+    window_days: int = 14,
+) -> list[list]:
+    excl = exclude or set()
+    cutoff = date.today() - timedelta(days=window_days)
+    recent = [r for r in rows if _d(r["date"]) > cutoff]
+    if not recent:
+        return []
+
+    dates = sorted({r["date"] for r in recent})
+    customers_in_data = {r["jobcode"] for r in recent if r["jobcode"] and r["jobcode"] not in excl}
+    customers_with_exp = {c for c, exp in expected_daily.items() if exp and c not in excl}
+    customers = sorted(customers_in_data | customers_with_exp)
+
+    data: dict[tuple, float] = defaultdict(float)
+    for r in recent:
+        if r["jobcode"] and r["jobcode"] not in excl:
+            data[(r["jobcode"], r["date"])] += r["hours"]
+
+    DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    header = ["Customer"] + DOW + [_daily_label(_d(d)) for d in dates]
+    out = [header]
+    totals = [0.0] * len(dates)
+
+    for c in customers:
+        exp = expected_daily.get(c, {})
+        row: list[Any] = [c]
+        for dow in range(7):
+            v = exp.get(dow)
+            row.append(v if v is not None else "")
+        for i, date_str in enumerate(dates):
+            d = _d(date_str)
+            dow = d.weekday()
+            actual = round(data.get((c, date_str), 0.0), 2)
+            exp_day = exp.get(dow)
+            totals[i] += actual
+            if exp_day is not None:
+                row.append(round(actual - exp_day, 2))
+            else:
+                row.append(actual if actual else "")
+        out.append(row)
+
+    out.append(["TOTAL"] + [""] * 7 + [_r(t) for t in totals])
+    return out
+
+
 def build_weekly_variance(
     rows: list[dict],
     expected_weekly: dict[str, float],
@@ -312,6 +361,7 @@ def rebuild_summaries(
     exp_weekly_override: dict[str, float] | None = None,
     exp_monthly_override: dict[str, float] | None = None,
     exclude_customers: set[str] | None = None,
+    expected_daily: dict[str, dict[int, float]] | None = None,
 ) -> None:
     if rows is None:
         print("[summaries] Reading Raw Data …")
@@ -337,6 +387,7 @@ def rebuild_summaries(
         exp_monthly = read_expected(od, user_id, item_id, "Monthly Variance")
 
     excl = exclude_customers or set()
+    exp_daily = expected_daily or {}
 
     tables: dict[str, list[list]] = {
         "Daily":            build_daily(rows),
@@ -346,7 +397,10 @@ def rebuild_summaries(
         "Recent (2 Weeks)": build_recent(rows),
         "Weekly Variance":  build_weekly_variance(rows, exp_weekly, exclude=excl),
         "Monthly Variance": build_monthly_variance(rows, exp_monthly, exclude=excl),
+        "Daily Variance":   build_daily_variance(rows, exp_daily, exclude=excl),
     }
+
+    od.ensure_worksheet(user_id, item_id, "Daily Variance")
 
     for sheet, table in tables.items():
         if not table:

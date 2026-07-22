@@ -60,6 +60,31 @@ EXPECTED_MONTHLY: dict[str, float] = {
 
 EXCLUDE_CUSTOMERS: set[str] = {"Unknown", "Logan Correctional Center"}
 
+# Expected hours per day of week per customer (0=Mon … 6=Sun).
+# Accounts with alternating weekend days or irregular schedules are omitted
+# (the tab will show actuals only for those).
+EXPECTED_DAILY: dict[str, dict[int, float]] = {
+    # User-specified schedule:
+    "Bethel Lutheran Church":          {0: 6,    1: 12,   2: 6,    3: 6,    4: 12  },
+    # Derived from historical data:
+    "Accel Entertainment":             {0: 2.8,  2: 3.7,  4: 3.3                   },
+    "Blunier Builders":                {5: 4.0                                       },
+    "Contech Engineered Solutions":    {0: 3.0,  3: 3.2                             },
+    "CTI":                             {1: 1.5                                       },
+    "IUOE 649":                        {1: 1.7,  6: 1.7                             },
+    "Johnson Controls":                {1: 1.5                                       },
+    "Metamora Christian Union Church": {3: 5.6                                       },
+    "Metamora Industries":             {1: 3.0,  3: 3.6                             },
+    "Midwest Multicare":               {6: 2.7                                       },
+    "Morton Industries":               {1: 2.0,  4: 2.9                             },
+    "Peoria Park District":            {1: 4.25, 4: 4.0                             },
+    "Thermosystem, LLC":               {0: 1.4                                       },
+    "Winpak Heat Seal Corporation":    {0: 7.6,  1: 4.5,  2: 5.3,  3: 6.4, 4: 5.0 },
+    "Woodford County Health Department":  {0: 2.0, 1: 2.2, 2: 2.5, 3: 1.5         },
+    "Woodford County Sheriff's Office":   {0: 11.2, 1: 11.7, 2: 11.0, 3: 7.9,
+                                           4: 6.6, 5: 2.7, 6: 3.2                  },
+}
+
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Sync QuickBooks Time → OneDrive Excel")
@@ -165,7 +190,8 @@ def main() -> None:
             rebuild_summaries(od, user_id, item_id, rows=parsed,
                               exp_weekly_override=EXPECTED_WEEKLY,
                               exp_monthly_override=EXPECTED_MONTHLY,
-                              exclude_customers=EXCLUDE_CUSTOMERS)
+                              exclude_customers=EXCLUDE_CUSTOMERS,
+                              expected_daily=EXPECTED_DAILY)
         finally:
             od.close_workbook_session(user_id, item_id)
         return
