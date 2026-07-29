@@ -31,7 +31,7 @@ SHEET_NAME = "Raw Data"
 
 EXPECTED_WEEKLY: dict[str, float] = {
     "Accel Entertainment":                       11,
-    "Bethel Lutheran Church":                    42,
+    "Bethel Lutheran Church and School":         42,
     "Blunier Builders":                           4,
     "CTI":                                        6,
     "Contech Engineered Solutions":               6,
@@ -64,7 +64,7 @@ EXCLUDE_CUSTOMERS: set[str] = {"Unknown", "Logan Correctional Center", "Johnson 
 # (the tab will show actuals only for those).
 EXPECTED_DAILY: dict[str, dict[int, float]] = {
     # User-specified schedule:
-    "Bethel Lutheran Church":          {0: 6,    1: 12,   2: 6,    3: 6,    4: 12  },
+    "Bethel Lutheran Church and School": {0: 6,    1: 12,   2: 6,    3: 6,    4: 12  },
     # Derived from historical data:
     "Accel Entertainment":             {0: 2.8,  2: 3.7,  4: 3.3                   },
     "Blunier Builders":                {5: 4.0                                       },
