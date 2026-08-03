@@ -79,8 +79,8 @@ EXPECTED_DAILY: dict[str, dict[int, float]] = {
     "Thermosystem, LLC":               {0: 1.4                                       },
     "Winpak Heat Seal Corporation":    {0: 7.6,  1: 4.5,  2: 5.3,  3: 6.4, 4: 5.0 },
     "Woodford County Health Department":  {0: 2.5, 1: 2.5, 2: 2.5, 3: 2.5         },
-    "Woodford County Sheriff's Office":   {0: 10.0, 1: 10.0, 2: 10.0, 3: 10.0,
-                                           4: 10.0, 5: 10.0, 6: 10.0              },
+    "Woodford County Sheriff's Office":   {0: 16.5, 1: 14.0, 2: 18.0, 3: 9.5,
+                                           4: 9.5,  5: 2.5,  6: 2.5              },
 }
 
 
