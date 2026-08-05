@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: Context) {
 
   const { data: existing } = await supabase
     .from('supply_requests')
-    .select(`id, status, order_number, public_status_token, account:accounts(name), requester:app_users(email, name)`)
+    .select(`id, status, order_number, public_status_token, requester_name, requester_email, account:accounts(name)`)
     .eq('id', id)
     .single()
 
@@ -43,7 +43,7 @@ export async function PATCH(request: NextRequest, { params }: Context) {
 
   const oldStatus = existing.status
   const account = (existing as any).account as { name: string } | null
-  const requester = (existing as any).requester as { email: string | null; name: string } | null
+  const requesterEmail = (existing as any).requester_email as string | null
 
   // Audit log
   if (status && status !== oldStatus) {
@@ -56,14 +56,14 @@ export async function PATCH(request: NextRequest, { params }: Context) {
       notes: `Status changed from ${oldStatus} to ${status}`,
     })
 
-    // Notify requester
-    if (STATUS_THAT_NOTIFY.includes(status) && requester?.email) {
+    // Notify requester if they provided an email
+    if (STATUS_THAT_NOTIFY.includes(status) && requesterEmail) {
       await sendRequesterStatusUpdate({
         requestId: id,
         orderNumber: existing.order_number,
         accountName: account?.name || '',
         newStatus: status,
-        requesterEmail: requester.email,
+        requesterEmail,
         publicStatusToken: existing.public_status_token,
       }).catch((err) => console.error('Status update email error', err))
     }
