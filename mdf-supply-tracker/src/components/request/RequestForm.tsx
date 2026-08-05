@@ -143,7 +143,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
       {/* Requester name + email */}
       <div className="bg-white rounded-lg shadow-sm p-4 space-y-3">
         <div>
-          <label htmlFor="requesterName" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="requesterName" className="block text-base font-medium text-gray-800 mb-1.5">
             Your Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -152,12 +152,12 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
             value={requesterName}
             onChange={(e) => setRequesterName(e.target.value)}
             placeholder="First and last name"
-            className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {errors.requesterName && <p className="text-red-500 text-xs mt-1">{errors.requesterName}</p>}
         </div>
         <div>
-          <label htmlFor="requesterEmail" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="requesterEmail" className="block text-base font-medium text-gray-800 mb-1.5">
             Your Email <span className="text-gray-400 font-normal">(optional — for status updates)</span>
           </label>
           <input
@@ -166,21 +166,21 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
             value={requesterEmail}
             onChange={(e) => setRequesterEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
 
       {/* Account */}
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <label htmlFor="account" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="account" className="block text-base font-medium text-gray-800 mb-1.5">
           Account <span className="text-red-500">*</span>
         </label>
         <select
           id="account"
           value={accountId}
           onChange={(e) => setAccountId(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select account…</option>
           {accounts.map((a) => (
@@ -192,14 +192,14 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
 
       {/* Urgency */}
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <label htmlFor="urgency" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="urgency" className="block text-base font-medium text-gray-800 mb-1.5">
           Urgency <span className="text-red-500">*</span>
         </label>
         <select
           id="urgency"
           value={urgency}
           onChange={(e) => setUrgency(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select urgency…</option>
           {URGENCY_LEVELS.map((u) => (
@@ -237,7 +237,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
                 <select
                   value={li.catalogItemId}
                   onChange={(e) => updateLine(i, 'catalogItemId', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select item…</option>
                   {categories.map((cat) => (
@@ -266,7 +266,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
                       placeholder="Describe the item…"
                       value={li.otherDescription}
                       onChange={(e) => updateLine(i, 'otherDescription', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     {errors[`line_${i}_other`] && (
                       <p className="text-red-500 text-xs mt-1">{errors[`line_${i}_other`]}</p>
@@ -282,10 +282,10 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
                     placeholder="Qty"
                     value={li.quantity}
                     onChange={(e) => updateLine(i, 'quantity', e.target.value)}
-                    className="w-28 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-28 border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {selectedItem?.unit_of_measure && (
-                    <span className="text-sm text-gray-500">{selectedItem.unit_of_measure}</span>
+                    <span className="text-base text-gray-600">{selectedItem.unit_of_measure}</span>
                   )}
                 </div>
                 {errors[`line_${i}_qty`] && (
@@ -307,7 +307,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
 
       {/* Notes */}
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="notes" className="block text-base font-medium text-gray-800 mb-1.5">
           Notes (optional)
         </label>
         <textarea
@@ -316,7 +316,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Any additional notes for the supply team…"
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
