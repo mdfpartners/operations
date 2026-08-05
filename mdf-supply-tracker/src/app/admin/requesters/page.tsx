@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 30
 
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import RequesterManager from '@/components/admin/RequesterManager'
