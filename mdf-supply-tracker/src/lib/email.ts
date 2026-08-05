@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
+import { getNotificationEmails } from '@/lib/notification-settings'
 
 let resend: Resend | null = null
 
@@ -129,10 +130,7 @@ export async function sendInternalNewRequestNotification(params: {
   submittedAt: string
   lineItems: { description: string; quantity: number }[]
 }) {
-  const recipientEmails = (process.env.INTERNAL_NOTIFICATION_EMAILS || '')
-    .split(',')
-    .map((e) => e.trim())
-    .filter(Boolean)
+  const recipientEmails = await getNotificationEmails('internal_notification_emails')
   if (recipientEmails.length === 0) return
 
   const baseUrl = process.env.APP_BASE_URL || ''
