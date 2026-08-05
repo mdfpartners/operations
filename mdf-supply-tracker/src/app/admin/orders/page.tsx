@@ -28,7 +28,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
     .from('supply_requests')
     .select(`
       id, order_number, status, urgency, submitted_at, completed_at, cancelled_at, created_at,
-      requester:app_users(name),
+      requester_name,
       account:accounts(id, name),
       purchase_details:request_line_items(purchase_details(total_cost))
     `)
@@ -111,7 +111,6 @@ export default async function OrdersPage({ searchParams }: PageProps) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredRows.map((o: any) => {
-                  const requester = o.requester as { name: string } | null
                   const account = o.account as { id: string; name: string } | null
                   return (
                     <tr key={o.id} className="hover:bg-gray-50">
@@ -121,7 +120,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-gray-700">{account?.name}</td>
-                      <td className="px-4 py-3 text-gray-700">{requester?.name}</td>
+                      <td className="px-4 py-3 text-gray-700">{o.requester_name}</td>
                       <td className="px-4 py-3 text-gray-500">
                         {new Date(o.submitted_at).toLocaleDateString('en-US', { timeZone: 'America/Chicago' })}
                       </td>

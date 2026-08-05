@@ -26,7 +26,7 @@ export default function OrderDetailClient({ order, agingBucket, daysOutstanding,
   const [savingPurchase, setSavingPurchase] = useState<Record<string, boolean>>({})
 
   const account = order.account as { id: string; name: string } | null
-  const requester = order.requester as { id: string; name: string; email: string | null } | null
+  const requesterName = order.requester_name as string | null
 
   async function saveOrderChanges() {
     setSaving(true)
@@ -134,8 +134,7 @@ export default function OrderDetailClient({ order, agingBucket, daysOutstanding,
 
       {/* Summary */}
       <div className="bg-white rounded-lg shadow-sm p-5 grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-        <div><p className="text-xs text-gray-500">Requester</p><p className="font-medium">{requester?.name}</p></div>
-        <div><p className="text-xs text-gray-500">Email</p><p>{requester?.email || '—'}</p></div>
+        <div><p className="text-xs text-gray-500">Requester</p><p className="font-medium">{requesterName || '—'}</p></div>
         <div><p className="text-xs text-gray-500">Urgency</p>
           <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${(URGENCY_COLORS as any)[order.urgency]}`}>
             {(URGENCY_LABELS as any)[order.urgency]}
