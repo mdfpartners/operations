@@ -23,7 +23,7 @@ function LoginForm() {
         body: JSON.stringify({ password }),
       })
       if (res.ok) {
-        router.push(from)
+        window.location.href = from
       } else {
         const data = await res.json()
         setError(data.error || 'Invalid password')
