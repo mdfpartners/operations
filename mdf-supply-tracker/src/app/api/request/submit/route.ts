@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
-import { sendInternalNewRequestNotification } from '@/lib/email'
+import { sendInternalNewRequestNotification, sendRequesterConfirmation } from '@/lib/email'
 import type { UrgencyLevel } from '@/types'
 
 const ALLOWED_URGENCIES: UrgencyLevel[] = [
@@ -12,7 +12,7 @@ const ALLOWED_URGENCIES: UrgencyLevel[] = [
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { requesterName, accountId, urgency, notes, lineItems } = body
+  const { requesterName, requesterEmail, accountId, urgency, notes, lineItems } = body
 
   if (!requesterName?.trim() || !accountId || !urgency || !lineItems?.length) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
     .from('supply_requests')
     .insert({
       requester_name: requesterName.trim(),
+      requester_email: requesterEmail || null,
       account_id: accountId,
       urgency,
       requester_notes: notes?.trim() || null,
@@ -114,6 +115,18 @@ export async function POST(request: NextRequest) {
     action: 'request_submitted',
     new_value: { order_number: supplyRequest.order_number, urgency, account_id: accountId },
   })
+
+  // Requester confirmation if email provided
+  if (requesterEmail) {
+    await sendRequesterConfirmation({
+      requestId: supplyRequest.id,
+      orderNumber: supplyRequest.order_number,
+      accountName: account.name,
+      submittedAt: supplyRequest.submitted_at,
+      requesterEmail,
+      publicStatusToken: supplyRequest.public_status_token,
+    }).catch((err) => console.error('Confirmation email error', err))
+  }
 
   // Internal notification
   await sendInternalNewRequestNotification({
