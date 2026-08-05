@@ -21,9 +21,9 @@ interface PageProps {
 export default async function OrdersPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const showAll = sp.show === 'all'
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
 
-  let query = supabase
+  let ordersQuery = supabase
     .from('supply_requests')
     .select(`
       id, order_number, status, urgency, submitted_at, completed_at, cancelled_at, created_at,
@@ -32,18 +32,18 @@ export default async function OrdersPage({ searchParams }: PageProps) {
       purchase_details:request_line_items(purchase_details(total_cost))
     `)
     .order('submitted_at', { ascending: false })
+    .limit(300)
 
-  if (!showAll) {
-    query = query.in('status', OPEN_STATUSES)
-  }
-  if (sp.status) query = query.eq('status', sp.status)
-  if (sp.urgency) query = query.eq('urgency', sp.urgency)
-  if (sp.account) query = query.eq('account_id', sp.account)
+  if (!showAll) ordersQuery = ordersQuery.in('status', OPEN_STATUSES)
+  if (sp.status) ordersQuery = ordersQuery.eq('status', sp.status)
+  if (sp.urgency) ordersQuery = ordersQuery.eq('urgency', sp.urgency)
+  if (sp.account) ordersQuery = ordersQuery.eq('account_id', sp.account)
 
-  const { data: orders } = await query
-
-  // Fetch accounts for filter dropdown
-  const { data: accounts } = await supabase.from('accounts').select('id, name').eq('active', true).order('name')
+  // Run both queries in parallel
+  const [{ data: orders }, { data: accounts }] = await Promise.all([
+    ordersQuery,
+    supabase.from('accounts').select('id, name').eq('active', true).order('name'),
+  ])
 
   const rows = (orders || []).map((o: any) => {
     const agingBucket = getAgingBucket(o.submitted_at, o.status as OrderStatus, o.completed_at, o.cancelled_at)
@@ -60,14 +60,12 @@ export default async function OrdersPage({ searchParams }: PageProps) {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-900">Orders</h1>
-        <div className="flex items-center gap-2">
-          <Link
-            href={showAll ? '/admin/orders' : '/admin/orders?show=all'}
-            className="text-sm text-blue-600 hover:underline"
-          >
-            {showAll ? 'Show open only' : 'Show all'}
-          </Link>
-        </div>
+        <Link
+          href={showAll ? '/admin/orders' : '/admin/orders?show=all'}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          {showAll ? 'Show open only' : 'Show all'}
+        </Link>
       </div>
 
       {/* Filters */}
@@ -114,8 +112,8 @@ export default async function OrdersPage({ searchParams }: PageProps) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredRows.map((o: any) => {
-                  const requester = (o as any).requester as { name: string } | null
-                  const account = (o as any).account as { id: string; name: string } | null
+                  const requester = o.requester as { name: string } | null
+                  const account = o.account as { id: string; name: string } | null
                   return (
                     <tr key={o.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
@@ -126,9 +124,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                       <td className="px-4 py-3 text-gray-700">{account?.name}</td>
                       <td className="px-4 py-3 text-gray-700">{requester?.name}</td>
                       <td className="px-4 py-3 text-gray-500">
-                        {new Date(o.submitted_at).toLocaleDateString('en-US', {
-                          timeZone: process.env.APP_TIMEZONE || 'America/Chicago',
-                        })}
+                        {new Date(o.submitted_at).toLocaleDateString('en-US', { timeZone: 'America/Chicago' })}
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${AGING_COLORS[o.agingBucket]}`}>
