@@ -1,18 +1,17 @@
 export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
 
-import { supabaseFetch } from '@/lib/supabase/edge-fetch'
+import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import SimpleManager from '@/components/admin/SimpleManager'
 
 export default async function VendorsPage() {
-  const vendors = await supabaseFetch('vendors?select=*&order=name', {
-    revalidate: 30,
-    tags: ['vendors'],
-  })
+  const supabase = createSupabaseServiceClient()
+  const { data: vendors } = await supabase.from('vendors').select('*').order('name')
 
   return (
     <SimpleManager
       title="Vendors"
-      items={vendors as any[]}
+      items={vendors as any[] || []}
       apiBase="/api/admin/vendors"
       fields={[
         { key: 'name', label: 'Vendor Name', required: true },

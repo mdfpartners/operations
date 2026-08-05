@@ -1,18 +1,17 @@
 export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
 
-import { supabaseFetch } from '@/lib/supabase/edge-fetch'
+import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import SimpleManager from '@/components/admin/SimpleManager'
 
 export default async function AccountsPage() {
-  const accounts = await supabaseFetch('accounts?select=*&order=name', {
-    revalidate: 30,
-    tags: ['accounts'],
-  })
+  const supabase = createSupabaseServiceClient()
+  const { data: accounts } = await supabase.from('accounts').select('*').order('name')
 
   return (
     <SimpleManager
       title="Accounts"
-      items={accounts as any[]}
+      items={accounts as any[] || []}
       apiBase="/api/admin/accounts"
       fields={[
         { key: 'name', label: 'Account Name', required: true },
