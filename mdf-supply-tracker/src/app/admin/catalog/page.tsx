@@ -4,7 +4,7 @@ import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import CatalogManager from '@/components/admin/CatalogManager'
 
 export default async function CatalogPage() {
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
   const { data: items } = await supabase
     .from('supply_catalog')
     .select('*, preferred_vendor:vendors(id, name)')
