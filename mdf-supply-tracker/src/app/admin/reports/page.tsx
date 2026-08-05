@@ -124,6 +124,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
         <div className="flex items-center gap-4">
           <Link href="/admin/reports/spend-by-account" className="text-sm text-blue-600 hover:underline">Spend by Account →</Link>
           <Link href="/admin/reports/spend-by-item" className="text-sm text-blue-600 hover:underline">Spend by Item →</Link>
+          <Link href="/admin/reports/by-requester" className="text-sm text-blue-600 hover:underline">By Requester →</Link>
           <a href="/api/admin/reports/export-orders" className="text-sm text-blue-600 hover:underline">Export CSV</a>
         </div>
       </div>
