@@ -37,7 +37,7 @@ export default async function PublicStatusPage({ params }: PageProps) {
     )
   }
 
-  const account = req.accounts as { name: string } | null
+  const account = req.accounts as unknown as { name: string } | null
   const agingBucket = getAgingBucket(req.submitted_at, req.status as any, req.completed_at, req.cancelled_at)
   const lineItems = req.request_line_items as any[] || []
 
