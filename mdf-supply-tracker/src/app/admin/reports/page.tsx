@@ -15,7 +15,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   const fromDate = sp.from || ''
   const toDate = sp.to || ''
 
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
 
   let ordersQuery = supabase
     .from('supply_requests')

@@ -6,7 +6,7 @@ interface Context { params: Promise<{ id: string }> }
 export async function PATCH(request: NextRequest, { params }: Context) {
   const { id } = await params
   const body = await request.json()
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
   const update: Record<string, unknown> = {}
   if (body.name !== undefined) update.name = body.name.trim()
   if (body.website !== undefined) update.website = body.website?.trim() || null

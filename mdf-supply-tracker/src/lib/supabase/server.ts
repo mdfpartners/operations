@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { connection } from 'next/server'
 
@@ -25,9 +26,9 @@ export async function createSupabaseServerClient() {
   )
 }
 
-export async function createSupabaseServiceClient() {
-  await connection()
-  const { createClient } = require('@supabase/supabase-js')
+// No connection() here — service client uses a static key, not cookies,
+// so it's safe to cache and doesn't need to opt into dynamic rendering.
+export function createSupabaseServiceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!

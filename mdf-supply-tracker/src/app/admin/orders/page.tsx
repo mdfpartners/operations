@@ -21,7 +21,7 @@ interface PageProps {
 export default async function OrdersPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const showAll = sp.show === 'all'
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
 
   let query = supabase
     .from('supply_requests')

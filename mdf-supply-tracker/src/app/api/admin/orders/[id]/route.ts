@@ -23,7 +23,7 @@ export async function PATCH(request: NextRequest, { params }: Context) {
     return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
   }
 
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
 
   const { data: existing } = await supabase
     .from('supply_requests')

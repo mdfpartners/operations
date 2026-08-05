@@ -9,7 +9,7 @@ function generateToken(): string {
 export async function POST(request: NextRequest) {
   const { name, email, phone, role, active, accountIds } = await request.json()
   if (!name?.trim()) return NextResponse.json({ error: 'Name is required' }, { status: 400 })
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
   const token = role === 'requester' ? generateToken() : null
   const { data: user, error } = await supabase.from('app_users').insert({
     name: name.trim(),

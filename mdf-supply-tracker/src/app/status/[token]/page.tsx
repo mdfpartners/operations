@@ -10,7 +10,7 @@ interface PageProps {
 
 export default async function PublicStatusPage({ params }: PageProps) {
   const { token } = await params
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
 
   const { data: req } = await supabase
     .from('supply_requests')

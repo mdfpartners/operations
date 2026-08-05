@@ -9,7 +9,7 @@ interface PageProps {
 
 export default async function RequestPage({ params }: PageProps) {
   const { token } = await params
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
 
   // Token lookup — server-side, scoped to this token only
   const { data: requester } = await supabase

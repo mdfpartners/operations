@@ -13,7 +13,7 @@ interface PageProps {
 
 export default async function OrderDetailPage({ params }: PageProps) {
   const { id } = await params
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
 
   const { data: order } = await supabase
     .from('supply_requests')

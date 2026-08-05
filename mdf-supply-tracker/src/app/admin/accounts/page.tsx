@@ -4,7 +4,7 @@ import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import SimpleManager from '@/components/admin/SimpleManager'
 
 export default async function AccountsPage() {
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
   const { data: accounts } = await supabase.from('accounts').select('*').order('name')
   return (
     <SimpleManager
