@@ -20,8 +20,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
     .select(`
       id, order_number, status, urgency, requester_notes, internal_notes,
       submitted_at, completed_at, cancelled_at, public_status_token, created_at, updated_at,
-      account_id,
-      requester:app_users(id, name, email),
+      account_id, requester_name,
       account:accounts(id, name),
       request_line_items(
         id, quantity_requested, quantity_purchased, line_status, other_item_description,
