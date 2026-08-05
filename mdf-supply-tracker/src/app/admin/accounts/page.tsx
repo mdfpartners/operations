@@ -1,21 +1,14 @@
-export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
-import { unstable_cache } from 'next/cache'
-import { createSupabaseServiceClient } from '@/lib/supabase/server'
+import { supabaseFetch } from '@/lib/supabase/edge-fetch'
 import SimpleManager from '@/components/admin/SimpleManager'
 
-const getAccounts = unstable_cache(
-  async () => {
-    const supabase = createSupabaseServiceClient()
-    const { data } = await supabase.from('accounts').select('*').order('name')
-    return data || []
-  },
-  ['accounts-list'],
-  { revalidate: 30, tags: ['accounts'] }
-)
-
 export default async function AccountsPage() {
-  const accounts = await getAccounts()
+  const accounts = await supabaseFetch('accounts?select=*&order=name', {
+    revalidate: 30,
+    tags: ['accounts'],
+  })
+
   return (
     <SimpleManager
       title="Accounts"
