@@ -1,3 +1,4 @@
+export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
@@ -14,7 +15,6 @@ export default async function OrderDetailPage({ params }: PageProps) {
   const { id } = await params
   const supabase = createSupabaseServiceClient()
 
-  // Fetch order first so we can get account_id for the related queries
   const { data: order } = await supabase
     .from('supply_requests')
     .select(`
@@ -41,7 +41,6 @@ export default async function OrderDetailPage({ params }: PageProps) {
   const fourteenDaysAgo = new Date()
   fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14)
 
-  // Run all secondary queries in parallel
   const [
     { data: recentRequests },
     { data: auditLog },

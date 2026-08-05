@@ -1,3 +1,4 @@
+export const runtime = 'edge'
 export const revalidate = 30
 
 import { createSupabaseServiceClient } from '@/lib/supabase/server'

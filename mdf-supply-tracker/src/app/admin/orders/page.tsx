@@ -1,3 +1,4 @@
+export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
@@ -39,7 +40,6 @@ export default async function OrdersPage({ searchParams }: PageProps) {
   if (sp.urgency) ordersQuery = ordersQuery.eq('urgency', sp.urgency)
   if (sp.account) ordersQuery = ordersQuery.eq('account_id', sp.account)
 
-  // Run both queries in parallel
   const [{ data: orders }, { data: accounts }] = await Promise.all([
     ordersQuery,
     supabase.from('accounts').select('id, name').eq('active', true).order('name'),
@@ -68,7 +68,6 @@ export default async function OrdersPage({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      {/* Filters */}
       <form method="GET" className="flex flex-wrap gap-3 mb-4">
         {showAll && <input type="hidden" name="show" value="all" />}
         <select name="account" defaultValue={sp.account || ''} className="border border-gray-300 rounded-md px-2 py-1.5 text-sm">
