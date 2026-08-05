@@ -12,9 +12,9 @@ const ALLOWED_URGENCIES: UrgencyLevel[] = [
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { token, accountId, urgency, notes, lineItems } = body
+  const { requesterName, requesterEmail, accountId, urgency, notes, lineItems } = body
 
-  if (!token || !accountId || !urgency || !lineItems?.length) {
+  if (!requesterName?.trim() || !accountId || !urgency || !lineItems?.length) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
@@ -24,30 +24,17 @@ export async function POST(request: NextRequest) {
 
   const supabase = createSupabaseServiceClient()
 
-  // Validate token — server-side
-  const { data: requester } = await supabase
-    .from('app_users')
-    .select('id, name, email, active')
-    .eq('request_token', token)
-    .eq('role', 'requester')
+  // Validate account is active
+  const { data: account } = await supabase
+    .from('accounts')
+    .select('id, name')
+    .eq('id', accountId)
+    .eq('active', true)
     .single()
 
-  if (!requester || !requester.active) {
-    return NextResponse.json({ error: 'Invalid or inactive request link' }, { status: 403 })
+  if (!account) {
+    return NextResponse.json({ error: 'Invalid account' }, { status: 400 })
   }
-
-  // Validate account belongs to requester
-  const { data: permission } = await supabase
-    .from('requester_account_permissions')
-    .select('id, accounts(id, name)')
-    .eq('requester_id', requester.id)
-    .eq('account_id', accountId)
-    .single()
-
-  if (!permission) {
-    return NextResponse.json({ error: 'Account not permitted for this requester' }, { status: 403 })
-  }
-  const account = permission.accounts as unknown as { id: string; name: string } | null
 
   // Validate line items
   const resolvedItems: {
@@ -74,7 +61,6 @@ export async function POST(request: NextRequest) {
         itemLabel: li.otherDescription.trim(),
       })
     } else {
-      // Verify catalog item exists and is active
       const { data: catalogItem } = await supabase
         .from('supply_catalog')
         .select('id, item_name, active')
@@ -98,7 +84,8 @@ export async function POST(request: NextRequest) {
   const { data: supplyRequest, error: insertError } = await supabase
     .from('supply_requests')
     .insert({
-      requester_id: requester.id,
+      requester_name: requesterName.trim(),
+      requester_email: requesterEmail?.trim() || null,
       account_id: accountId,
       urgency,
       requester_notes: notes?.trim() || null,
@@ -123,29 +110,29 @@ export async function POST(request: NextRequest) {
   // Audit log
   await supabase.from('audit_log').insert({
     request_id: supplyRequest.id,
-    actor_user_id: requester.id,
-    actor_name: requester.name,
+    actor_name: requesterName.trim(),
     action: 'request_submitted',
     new_value: { order_number: supplyRequest.order_number, urgency, account_id: accountId },
   })
 
-  // Emails
-  if (requester.email) {
+  // Send confirmation to requester if email provided
+  if (requesterEmail?.trim()) {
     await sendRequesterConfirmation({
       requestId: supplyRequest.id,
       orderNumber: supplyRequest.order_number,
-      accountName: account?.name || '',
+      accountName: account.name,
       submittedAt: supplyRequest.submitted_at,
-      requesterEmail: requester.email,
+      requesterEmail: requesterEmail.trim(),
       publicStatusToken: supplyRequest.public_status_token,
     }).catch((err) => console.error('Confirmation email error', err))
   }
 
+  // Notify internal team
   await sendInternalNewRequestNotification({
     requestId: supplyRequest.id,
     orderNumber: supplyRequest.order_number,
-    accountName: account?.name || '',
-    requesterName: requester.name,
+    accountName: account.name,
+    requesterName: requesterName.trim(),
     urgency,
     submittedAt: supplyRequest.submitted_at,
     lineItems: resolvedItems.map((li) => ({ description: li.itemLabel, quantity: li.quantity })),
@@ -154,5 +141,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     orderNumber: supplyRequest.order_number,
     requestId: supplyRequest.id,
+    statusToken: supplyRequest.public_status_token,
   })
 }

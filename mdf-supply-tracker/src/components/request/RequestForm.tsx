@@ -19,20 +19,20 @@ interface LineItem {
 const EMPTY_LINE: LineItem = { catalogItemId: '', otherDescription: '', quantity: '' }
 
 interface Props {
-  requester: { id: string; name: string }
   accounts: { id: string; name: string }[]
   catalogItems: CatalogItem[]
-  token: string
 }
 
-export default function RequestForm({ requester, accounts, catalogItems, token }: Props) {
+export default function RequestForm({ accounts, catalogItems }: Props) {
+  const [requesterName, setRequesterName] = useState('')
+  const [requesterEmail, setRequesterEmail] = useState('')
   const [accountId, setAccountId] = useState(accounts.length === 1 ? accounts[0].id : '')
   const [urgency, setUrgency] = useState('')
   const [notes, setNotes] = useState('')
   const [lineItems, setLineItems] = useState<LineItem[]>([{ ...EMPTY_LINE }])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
-  const [orderNumber, setOrderNumber] = useState<string | null>(null)
+  const [submitted, setSubmitted] = useState<{ orderNumber: string; statusToken?: string } | null>(null)
 
   function addLineItem() {
     setLineItems((prev) => [...prev, { ...EMPTY_LINE }])
@@ -53,6 +53,7 @@ export default function RequestForm({ requester, accounts, catalogItems, token }
 
   function validate(): boolean {
     const errs: Record<string, string> = {}
+    if (!requesterName.trim()) errs.requesterName = 'Your name is required'
     if (!accountId) errs.accountId = 'Please select an account'
     if (!urgency) errs.urgency = 'Please select an urgency level'
     if (lineItems.length === 0) errs.lineItems = 'At least one item is required'
@@ -78,11 +79,11 @@ export default function RequestForm({ requester, accounts, catalogItems, token }
       const res = await fetch('/api/request/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, accountId, urgency, notes, lineItems }),
+        body: JSON.stringify({ requesterName, requesterEmail, accountId, urgency, notes, lineItems }),
       })
       const data = await res.json()
       if (res.ok) {
-        setOrderNumber(data.orderNumber)
+        setSubmitted({ orderNumber: data.orderNumber, statusToken: data.statusToken })
       } else {
         setErrors({ form: data.error || 'Submission failed — please try again.' })
       }
@@ -93,7 +94,7 @@ export default function RequestForm({ requester, accounts, catalogItems, token }
     }
   }
 
-  if (orderNumber) {
+  if (submitted) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <div className="text-4xl mb-4">✓</div>
@@ -101,17 +102,29 @@ export default function RequestForm({ requester, accounts, catalogItems, token }
         <p className="text-gray-600 mb-4">Your supply request has been received.</p>
         <div className="bg-gray-50 rounded-md px-4 py-3 inline-block">
           <p className="text-sm text-gray-500">Order Number</p>
-          <p className="text-2xl font-bold text-blue-700">{orderNumber}</p>
+          <p className="text-2xl font-bold text-blue-700">{submitted.orderNumber}</p>
         </div>
-        <p className="text-gray-500 text-sm mt-4">
-          You will receive an email confirmation if an email address is on file.
-        </p>
+        {requesterEmail && (
+          <p className="text-gray-500 text-sm mt-4">
+            A confirmation has been sent to <strong>{requesterEmail}</strong>.
+          </p>
+        )}
+        {submitted.statusToken && (
+          <p className="mt-3">
+            <a href={`/status/${submitted.statusToken}`} className="text-blue-600 hover:underline text-sm">
+              Track order status →
+            </a>
+          </p>
+        )}
         <button
           onClick={() => {
-            setOrderNumber(null)
+            setSubmitted(null)
+            setRequesterName('')
+            setRequesterEmail('')
             setLineItems([{ ...EMPTY_LINE }])
             setNotes('')
             setUrgency('')
+            setAccountId(accounts.length === 1 ? accounts[0].id : '')
             setErrors({})
           }}
           className="mt-6 text-blue-600 hover:text-blue-800 text-sm font-medium underline underline-offset-2"
@@ -127,10 +140,35 @@ export default function RequestForm({ requester, accounts, catalogItems, token }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Requester (locked) */}
-      <div className="bg-white rounded-lg shadow-sm p-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Submitted by</label>
-        <p className="text-gray-900 font-medium">{requester.name}</p>
+      {/* Requester name + email */}
+      <div className="bg-white rounded-lg shadow-sm p-4 space-y-3">
+        <div>
+          <label htmlFor="requesterName" className="block text-sm font-medium text-gray-700 mb-1">
+            Your Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="requesterName"
+            type="text"
+            value={requesterName}
+            onChange={(e) => setRequesterName(e.target.value)}
+            placeholder="First and last name"
+            className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.requesterName && <p className="text-red-500 text-xs mt-1">{errors.requesterName}</p>}
+        </div>
+        <div>
+          <label htmlFor="requesterEmail" className="block text-sm font-medium text-gray-700 mb-1">
+            Your Email <span className="text-gray-400 font-normal">(optional — for status updates)</span>
+          </label>
+          <input
+            id="requesterEmail"
+            type="email"
+            value={requesterEmail}
+            onChange={(e) => setRequesterEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
       </div>
 
       {/* Account */}
