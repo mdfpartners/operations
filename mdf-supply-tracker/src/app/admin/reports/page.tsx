@@ -121,7 +121,11 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Reports</h1>
-        <a href="/api/admin/reports/export-orders" className="text-sm text-blue-600 hover:underline">Export order history (CSV)</a>
+        <div className="flex items-center gap-4">
+          <Link href="/admin/reports/spend-by-account" className="text-sm text-blue-600 hover:underline">Spend by Account →</Link>
+          <Link href="/admin/reports/spend-by-item" className="text-sm text-blue-600 hover:underline">Spend by Item →</Link>
+          <a href="/api/admin/reports/export-orders" className="text-sm text-blue-600 hover:underline">Export CSV</a>
+        </div>
       </div>
 
       {/* Date range filter */}

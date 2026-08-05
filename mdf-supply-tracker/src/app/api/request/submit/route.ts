@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   if (!permission) {
     return NextResponse.json({ error: 'Account not permitted for this requester' }, { status: 403 })
   }
-  const account = permission.accounts as { id: string; name: string } | null
+  const account = permission.accounts as unknown as { id: string; name: string } | null
 
   // Validate line items
   const resolvedItems: {
