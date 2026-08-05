@@ -58,7 +58,7 @@ export async function sendEmail(opts: SendEmailOptions): Promise<void> {
   for (const email of opts.to) {
     try {
       await client.emails.send({
-        from: 'MDF Supply Tracker <noreply@mdfpartners.com>',
+        from: process.env.EMAIL_FROM || 'MDF Supply Tracker <noreply@maddogcleaning.com>',
         to: email,
         subject: opts.subject,
         html: opts.html,
