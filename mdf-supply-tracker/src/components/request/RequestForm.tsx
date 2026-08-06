@@ -62,9 +62,9 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
       if (li.catalogItemId === 'other' && !li.otherDescription.trim()) {
         errs[`line_${i}_other`] = 'Item description is required'
       }
-      const qty = parseFloat(li.quantity)
-      if (!li.quantity || isNaN(qty) || qty <= 0) {
-        errs[`line_${i}_qty`] = 'Quantity must be greater than 0'
+      const qty = parseInt(li.quantity, 10)
+      if (!li.quantity || isNaN(qty) || qty < 1 || String(qty) !== String(Math.floor(Number(li.quantity)))) {
+        errs[`line_${i}_qty`] = 'Quantity must be a whole number (1 or more)'
       }
     })
     setErrors(errs)
@@ -277,8 +277,8 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
-                    min="0.01"
-                    step="any"
+                    min="1"
+                    step="1"
                     placeholder="Qty"
                     value={li.quantity}
                     onChange={(e) => updateLine(i, 'quantity', e.target.value)}

@@ -45,8 +45,8 @@ export async function POST(request: NextRequest) {
   }[] = []
 
   for (const li of lineItems) {
-    const qty = parseFloat(li.quantity)
-    if (!li.catalogItemId || isNaN(qty) || qty <= 0) {
+    const qty = parseInt(li.quantity, 10)
+    if (!li.catalogItemId || isNaN(qty) || qty < 1) {
       return NextResponse.json({ error: 'Invalid line item data' }, { status: 400 })
     }
 
