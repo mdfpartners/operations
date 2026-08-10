@@ -41,7 +41,6 @@ EXPECTED_WEEKLY: dict[str, float] = {
     "IUOE 649":                                   4,
     "Metamora Christian Union Church":            5.5,
     "Metamora Industries":                       13,
-    "Midwest Multicare":                          3,
     "Morton Industries":                          8,
     "Office/Management Time":                    15,
     "Peoria County Veteran Assistance Commission": 1.8,
@@ -57,7 +56,7 @@ EXPECTED_MONTHLY: dict[str, float] = {
     k: round(v * 52 / 12, 2) for k, v in EXPECTED_WEEKLY.items()
 }
 
-EXCLUDE_CUSTOMERS: set[str] = {"Unknown", "Logan Correctional Center", "Johnson Controls"}
+EXCLUDE_CUSTOMERS: set[str] = {"Unknown", "Logan Correctional Center", "Johnson Controls", "Midwest Multicare"}
 
 # Expected hours per day of week per customer (0=Mon … 6=Sun).
 # Accounts with alternating weekend days or irregular schedules are omitted
@@ -73,7 +72,6 @@ EXPECTED_DAILY: dict[str, dict[int, float]] = {
     "IUOE 649":                        {1: 1.7,  6: 1.7                             },
     "Metamora Christian Union Church": {3: 5.6                                       },
     "Metamora Industries":             {1: 5.5,  3: 5.5                             },
-    "Midwest Multicare":               {6: 2.7                                       },
     "Morton Industries":               {1: 3.75, 4: 3.75                            },
     "Peoria Park District":            {1: 4.25, 4: 4.0                             },
     "Thermosystem, LLC":               {0: 1.4                                       },
