@@ -7,6 +7,11 @@ import { OPEN_STATUSES, STATUS_LABELS } from '@/lib/constants'
 import type { OrderStatus } from '@/types'
 import { toZonedTime } from 'date-fns-tz'
 
+function daysSince(isoTimestamp: string): number {
+  const ms = Date.now() - new Date(isoTimestamp).getTime()
+  return Math.floor(ms / 86400000)
+}
+
 export async function GET(request: NextRequest) {
   // Protect with CRON_SECRET
   // Vercel sends: Authorization: Bearer <CRON_SECRET>
@@ -26,7 +31,7 @@ export async function GET(request: NextRequest) {
   const { data: orders } = await supabase
     .from('supply_requests')
     .select(`
-      id, order_number, status, urgency, submitted_at, completed_at, cancelled_at,
+      id, order_number, status, urgency, submitted_at, completed_at, cancelled_at, status_changed_at,
       account:accounts(name)
     `)
     .in('status', OPEN_STATUSES)
@@ -42,31 +47,54 @@ export async function GET(request: NextRequest) {
   const tableRows = (open as any[]).map((o) => {
     const bucket = getAgingBucket(o.submitted_at, o.status as OrderStatus, o.completed_at, o.cancelled_at)
     const account = (o as any).account as { name: string } | null
-    return `<tr>
-      <td style="padding:6px 8px"><a href="${baseUrl}/admin/orders/${o.id}">${o.order_number}</a></td>
-      <td style="padding:6px 8px">${account?.name || '—'}</td>
-      <td style="padding:6px 8px">${bucket}d</td>
-      <td style="padding:6px 8px">${STATUS_LABELS[o.status as OrderStatus]}</td>
+    // Days in current status (falls back to overall aging if column not yet available)
+    const statusDays = o.status_changed_at ? daysSince(o.status_changed_at) : daysSince(o.submitted_at)
+    const statusLabel = STATUS_LABELS[o.status as OrderStatus]
+    // Highlight rows stuck in current status for 3+ days
+    const rowBg = statusDays >= 3 ? 'background:#fef9c3' : ''
+    return `<tr style="${rowBg}">
+      <td style="padding:6px 10px"><a href="${baseUrl}/admin/orders/${o.id}" style="color:#1d4ed8">${o.order_number}</a></td>
+      <td style="padding:6px 10px">${account?.name || '—'}</td>
+      <td style="padding:6px 10px;text-align:center">${bucket}d</td>
+      <td style="padding:6px 10px">${statusLabel}</td>
+      <td style="padding:6px 10px;text-align:center;color:${statusDays >= 3 ? '#b45309' : '#374151'};font-weight:${statusDays >= 3 ? '600' : 'normal'}">${statusDays}d in stage</td>
     </tr>`
   }).join('')
 
   const html = `
-    <h2>MDF Supply Request Aging Dashboard — ${today}</h2>
-    <p><strong>Open Requests:</strong> ${open.length} &nbsp;|&nbsp;
-       <strong>8+ Days:</strong> ${eightPlus.length} &nbsp;|&nbsp;
-       <strong>Emergency/OOS:</strong> ${emergency.length}</p>
-    <table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;max-width:700px">
-      <thead style="background:#f3f4f6">
-        <tr>
-          <th style="padding:6px 8px;text-align:left">Order #</th>
-          <th style="padding:6px 8px;text-align:left">Account</th>
-          <th style="padding:6px 8px;text-align:left">Aging</th>
-          <th style="padding:6px 8px;text-align:left">Status</th>
-        </tr>
-      </thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-    <p style="color:#6b7280;font-size:12px;margin-top:16px">Click an order number to view details in the admin dashboard.</p>
+    <div style="font-family:sans-serif;max-width:720px;margin:0 auto">
+      <h2 style="color:#111827;margin-bottom:4px">MDF Supply Request Aging Dashboard</h2>
+      <p style="color:#6b7280;margin-top:0">${today}</p>
+      <div style="display:flex;gap:24px;margin-bottom:16px">
+        <div style="background:#f3f4f6;border-radius:6px;padding:10px 16px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#111827">${open.length}</div>
+          <div style="font-size:12px;color:#6b7280">Open Orders</div>
+        </div>
+        <div style="background:#fee2e2;border-radius:6px;padding:10px 16px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#b91c1c">${eightPlus.length}</div>
+          <div style="font-size:12px;color:#6b7280">8+ Day Orders</div>
+        </div>
+        <div style="background:#ffedd5;border-radius:6px;padding:10px 16px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#c2410c">${emergency.length}</div>
+          <div style="font-size:12px;color:#6b7280">Emergency / OOS</div>
+        </div>
+      </div>
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden">
+        <thead>
+          <tr style="background:#f9fafb;border-bottom:1px solid #e5e7eb">
+            <th style="padding:8px 10px;text-align:left;font-size:12px;color:#6b7280;font-weight:600">Order #</th>
+            <th style="padding:8px 10px;text-align:left;font-size:12px;color:#6b7280;font-weight:600">Account</th>
+            <th style="padding:8px 10px;text-align:center;font-size:12px;color:#6b7280;font-weight:600">Total Age</th>
+            <th style="padding:8px 10px;text-align:left;font-size:12px;color:#6b7280;font-weight:600">Status</th>
+            <th style="padding:8px 10px;text-align:center;font-size:12px;color:#6b7280;font-weight:600">In Stage</th>
+          </tr>
+        </thead>
+        <tbody style="border-top:1px solid #e5e7eb">
+          ${tableRows || '<tr><td colspan="5" style="padding:16px;text-align:center;color:#9ca3af">No open orders</td></tr>'}
+        </tbody>
+      </table>
+      <p style="color:#9ca3af;font-size:11px;margin-top:12px">Rows highlighted in yellow have been in the same stage for 3+ days. Click an order number to view details.</p>
+    </div>
   `
 
   const recipients = await getNotificationEmails('executive_notification_emails')
@@ -74,7 +102,7 @@ export async function GET(request: NextRequest) {
   if (recipients.length > 0) {
     await sendEmail({
       to: recipients,
-      subject: `MDF Supply Request Aging Dashboard — ${today}`,
+      subject: `MDF Supply Tracker — ${open.length} open order${open.length !== 1 ? 's' : ''} (${today})`,
       notificationType: 'executive_daily',
       html,
     })
