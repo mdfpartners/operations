@@ -9,9 +9,15 @@ import { toZonedTime } from 'date-fns-tz'
 
 export async function GET(request: NextRequest) {
   // Protect with CRON_SECRET
-  const secret = request.nextUrl.searchParams.get('secret') || request.headers.get('x-cron-secret')
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Vercel sends: Authorization: Bearer <CRON_SECRET>
+  // Manual triggers can use ?secret= or x-cron-secret header
+  if (process.env.CRON_SECRET) {
+    const authHeader = request.headers.get('authorization')
+    const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+    const secret = bearerSecret || request.nextUrl.searchParams.get('secret') || request.headers.get('x-cron-secret')
+    if (secret !== process.env.CRON_SECRET) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
 
   const tz = process.env.APP_TIMEZONE || 'America/Chicago'
