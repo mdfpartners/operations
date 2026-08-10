@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email'
+import { getNotificationEmails } from '@/lib/notification-settings'
 import { getAgingBucket } from '@/lib/aging'
 import { OPEN_STATUSES, STATUS_LABELS } from '@/lib/constants'
 import type { OrderStatus } from '@/types'
@@ -62,8 +63,7 @@ export async function GET(request: NextRequest) {
     <p style="color:#6b7280;font-size:12px;margin-top:16px">Click an order number to view details in the admin dashboard.</p>
   `
 
-  const recipients = (process.env.EXECUTIVE_NOTIFICATION_EMAILS || '')
-    .split(',').map((e) => e.trim()).filter(Boolean)
+  const recipients = await getNotificationEmails('executive_notification_emails')
 
   if (recipients.length > 0) {
     await sendEmail({
