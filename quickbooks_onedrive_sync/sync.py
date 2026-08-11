@@ -25,6 +25,7 @@ from dotenv import load_dotenv
 from qb_time import QBTimeClient, date_range_for_days_back
 from onedrive import OneDriveClient
 from summaries import rebuild_summaries, _d
+from email_report import send_variance_email
 
 HEADER     = ["Date", "Customer", "Employee", "Hours"]
 SHEET_NAME = "Raw Data"
@@ -92,6 +93,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--skip-duplicates", action="store_true", default=True)
     p.add_argument("--no-skip-duplicates", dest="skip_duplicates", action="store_false")
+    p.add_argument("--send-email", action="store_true", default=True,
+                   help="Send variance email after sync (default: on)")
+    p.add_argument("--no-email", dest="send_email", action="store_false",
+                   help="Skip variance email")
+    p.add_argument("--email-to", default=os.environ.get("VARIANCE_EMAIL_TO", "office@maddogcleaning.com"))
     return p.parse_args()
 
 
@@ -111,6 +117,19 @@ def _parse_for_summaries(raw_rows: list[list]) -> list[dict]:
 
 def rows_to_table(timesheets: list[dict]) -> list[list]:
     return [[ts["date"], ts["jobcode"], ts["user"], ts["hours"]] for ts in timesheets]
+
+
+def _send_variance(parsed: list[dict], report_date: date, email_to: str) -> None:
+    try:
+        send_variance_email(
+            rows=parsed,
+            target_date=report_date,
+            expected_daily=EXPECTED_DAILY,
+            exclude_customers=EXCLUDE_CUSTOMERS,
+            to_address=email_to,
+        )
+    except Exception as exc:
+        print(f"[email] Warning: could not send variance email: {exc}", file=sys.stderr)
 
 
 def main() -> None:
@@ -190,6 +209,8 @@ def main() -> None:
                               expected_daily=EXPECTED_DAILY)
         finally:
             od.close_workbook_session(user_id, item_id)
+        if args.send_email:
+            _send_variance(parsed, end, args.email_to)
         return
 
     print(f"[sync] Appending {len(rows)} rows to '{SHEET_NAME}' …")
@@ -206,9 +227,12 @@ def main() -> None:
         rebuild_summaries(od, user_id, item_id, rows=parsed,
                           exp_weekly_override=EXPECTED_WEEKLY,
                           exp_monthly_override=EXPECTED_MONTHLY,
-                          exclude_customers=EXCLUDE_CUSTOMERS)
+                          exclude_customers=EXCLUDE_CUSTOMERS,
+                          expected_daily=EXPECTED_DAILY)
     finally:
         od.close_workbook_session(user_id, item_id)
+    if args.send_email:
+        _send_variance(parsed, end, args.email_to)
 
 
 if __name__ == "__main__":
