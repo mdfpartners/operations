@@ -157,7 +157,7 @@ export default function OrderDetailClient({ order, agingBucket, daysOutstanding,
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as OrderStatus)}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900"
             >
               {ORDER_STATUSES.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -170,7 +170,7 @@ export default function OrderDetailClient({ order, agingBucket, daysOutstanding,
               rows={3}
               value={internalNotes}
               onChange={(e) => setInternalNotes(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900"
             />
           </div>
         </div>
@@ -229,7 +229,7 @@ export default function OrderDetailClient({ order, agingBucket, daysOutstanding,
                       <select
                         value={form.vendorId}
                         onChange={(e) => updatePurchaseField(li.id, 'vendorId', e.target.value)}
-                        className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5"
+                        className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5"
                       >
                         <option value="">— Select vendor —</option>
                         {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -237,39 +237,39 @@ export default function OrderDetailClient({ order, agingBucket, daysOutstanding,
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Product Name</label>
-                      <input type="text" value={form.productName} onChange={(e) => updatePurchaseField(li.id, 'productName', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" />
+                      <input type="text" value={form.productName} onChange={(e) => updatePurchaseField(li.id, 'productName', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Product URL</label>
-                      <input type="url" value={form.productUrl} onChange={(e) => updatePurchaseField(li.id, 'productUrl', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" placeholder="https://" />
+                      <input type="url" value={form.productUrl} onChange={(e) => updatePurchaseField(li.id, 'productUrl', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" placeholder="https://" />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Qty Purchased</label>
-                      <input type="number" value={form.quantityPurchased} onChange={(e) => updatePurchaseField(li.id, 'quantityPurchased', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" />
+                      <input type="number" value={form.quantityPurchased} onChange={(e) => updatePurchaseField(li.id, 'quantityPurchased', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Unit Cost ($)</label>
-                      <input type="number" step="0.01" value={form.unitCost} onChange={(e) => updatePurchaseField(li.id, 'unitCost', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" />
+                      <input type="number" step="0.01" value={form.unitCost} onChange={(e) => updatePurchaseField(li.id, 'unitCost', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Tax ($)</label>
-                      <input type="number" step="0.01" value={form.tax} onChange={(e) => updatePurchaseField(li.id, 'tax', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" />
+                      <input type="number" step="0.01" value={form.tax} onChange={(e) => updatePurchaseField(li.id, 'tax', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Shipping ($)</label>
-                      <input type="number" step="0.01" value={form.shipping} onChange={(e) => updatePurchaseField(li.id, 'shipping', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" />
+                      <input type="number" step="0.01" value={form.shipping} onChange={(e) => updatePurchaseField(li.id, 'shipping', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Total Cost ($)</label>
-                      <input type="number" step="0.01" value={form.totalCost} onChange={(e) => updatePurchaseField(li.id, 'totalCost', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" />
+                      <input type="number" step="0.01" value={form.totalCost} onChange={(e) => updatePurchaseField(li.id, 'totalCost', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Confirmation #</label>
-                      <input type="text" value={form.orderConfirmationNumber} onChange={(e) => updatePurchaseField(li.id, 'orderConfirmationNumber', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" />
+                      <input type="text" value={form.orderConfirmationNumber} onChange={(e) => updatePurchaseField(li.id, 'orderConfirmationNumber', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500">Est. Delivery Date</label>
-                      <input type="date" value={form.estimatedDeliveryDate} onChange={(e) => updatePurchaseField(li.id, 'estimatedDeliveryDate', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5" />
+                      <input type="date" value={form.estimatedDeliveryDate} onChange={(e) => updatePurchaseField(li.id, 'estimatedDeliveryDate', e.target.value)} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900 mt-0.5" />
                     </div>
                     <div className="sm:col-span-2 flex gap-2">
                       <button
