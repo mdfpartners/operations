@@ -18,7 +18,7 @@ export default async function PublicStatusPage({ params }: PageProps) {
       id, order_number, status, urgency, submitted_at, completed_at, cancelled_at,
       accounts(name),
       request_line_items(
-        id, quantity_requested, other_item_description,
+        id, quantity_requested, line_status, other_item_description,
         supply_catalog(item_name, unit_of_measure),
         purchase_details(estimated_delivery_date)
       )
@@ -89,15 +89,25 @@ export default async function PublicStatusPage({ params }: PageProps) {
           </div>
 
           {lineItems.length > 0 && (
-            <div>
-              <p className="text-xs font-medium text-gray-500 mb-2">Items Requested</p>
-              <ul className="space-y-1">
+            <div className="border-t pt-4">
+              <p className="text-sm font-semibold text-gray-800 mb-3">Items Requested</p>
+              <ul className="space-y-2">
                 {lineItems.map((li: any) => {
                   const itemName = li.supply_catalog?.item_name || li.other_item_description || 'Unknown item'
                   const uom = li.supply_catalog?.unit_of_measure
+                  const lineStatus = li.line_status as string | undefined
+                  const lineStatusLabel = lineStatus ? STATUS_LABELS[lineStatus as keyof typeof STATUS_LABELS] : null
                   return (
-                    <li key={li.id} className="text-sm text-gray-700">
-                      {itemName}{uom ? ` (${uom})` : ''} × {li.quantity_requested}
+                    <li key={li.id} className="flex items-start justify-between gap-3 text-sm">
+                      <span className="text-gray-800">
+                        <span className="font-medium">{li.quantity_requested}{uom ? ` ${uom}` : 'x'}</span>
+                        {' '}{itemName}
+                      </span>
+                      {lineStatusLabel && (
+                        <span className="shrink-0 text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">
+                          {lineStatusLabel}
+                        </span>
+                      )}
                     </li>
                   )
                 })}
