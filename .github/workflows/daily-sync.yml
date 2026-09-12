@@ -1,0 +1,40 @@
+name: QuickBooks → OneDrive Daily Sync
+
+on:
+  schedule:
+    # 6:00 AM CT — runs at 11:00 UTC (CDT, UTC-5) Sep–Nov
+    # Adjust to 12:00 UTC when CST (UTC-6) Nov–Mar
+    - cron: '0 11 * * *'
+  workflow_dispatch:   # allow manual trigger from GitHub Actions UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: quickbooks_onedrive_sync/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r quickbooks_onedrive_sync/requirements.txt
+
+      - name: Run sync
+        working-directory: quickbooks_onedrive_sync
+        env:
+          QBT_ACCESS_TOKEN:    ${{ secrets.QBT_ACCESS_TOKEN }}
+          AZURE_CLIENT_ID:     ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID:     ${{ secrets.AZURE_TENANT_ID }}
+          ONEDRIVE_FILE_PATH:  ${{ secrets.ONEDRIVE_FILE_PATH }}
+          ONEDRIVE_USER:       ${{ secrets.ONEDRIVE_USER }}
+          VARIANCE_EMAIL_TO:   ${{ secrets.VARIANCE_EMAIL_TO }}
+          DEFAULT_DAYS_BACK:   '1'
+        run: python sync.py --send-email --email-to "$VARIANCE_EMAIL_TO"
