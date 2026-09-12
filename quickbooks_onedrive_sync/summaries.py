@@ -367,6 +367,88 @@ def build_monthly_variance(
     return out
 
 
+_DOW_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+
+def build_missed_visits(
+    rows: list[dict],
+    expected_daily: dict[str, dict[int, float]],
+    exclude: set[str] | None = None,
+    window_days: int = 90,
+    threshold: float = 0.30,
+) -> list[list]:
+    """Return a table of days where an account was expected but showed < threshold of expected hours.
+
+    Columns: Date | Account | Day | Expected Hrs | Actual Hrs | Gap (Days) | Next Visit | Who Covered
+    Sorted by Date descending (most recent misses first).
+    """
+    excl   = exclude or set()
+    cutoff = date.today() - timedelta(days=window_days)
+
+    # Index all rows by (jobcode, date_str) → total hours and by (jobcode, date_str) → set of users
+    hours_by_key:   dict[tuple, float]     = defaultdict(float)
+    users_by_key:   dict[tuple, set[str]]  = defaultdict(set)
+    all_dates_by_account: dict[str, list[str]] = defaultdict(list)
+
+    for r in rows:
+        if not r["jobcode"] or r["jobcode"] in excl:
+            continue
+        key = (r["jobcode"], r["date"])
+        hours_by_key[key]  += r["hours"]
+        if r["user"]:
+            users_by_key[key].add(r["user"])
+        all_dates_by_account[r["jobcode"]].append(r["date"])
+
+    # Sort and deduplicate dates per account for "next visit" lookup
+    next_visit_dates: dict[str, list[date]] = {}
+    for acct, dates in all_dates_by_account.items():
+        next_visit_dates[acct] = sorted({_d(d) for d in dates})
+
+    header = ["Date", "Account", "Day", "Expected Hrs", "Actual Hrs", "Gap (Days)", "Next Visit", "Who Covered"]
+    missed: list[list] = []
+
+    for acct, schedule in expected_daily.items():
+        if acct in excl:
+            continue
+        for dow, exp_hrs in schedule.items():
+            # Walk every day of this DOW in the window
+            today = date.today()
+            # Find the first date >= cutoff+1 with this DOW
+            d = cutoff + timedelta(days=1)
+            offset = (dow - d.weekday()) % 7
+            d = d + timedelta(days=offset)
+            while d <= today:
+                date_str = d.isoformat()
+                actual   = round(hours_by_key.get((acct, date_str), 0.0), 2)
+                if actual < threshold * exp_hrs:
+                    # Find next visit after this date
+                    future = [vd for vd in next_visit_dates.get(acct, []) if vd > d]
+                    if future:
+                        next_d    = future[0]
+                        gap       = (next_d - d).days
+                        next_str  = next_d.isoformat()
+                        who       = ", ".join(sorted(users_by_key.get((acct, next_str), set()))) or "—"
+                    else:
+                        gap      = "—"
+                        next_str = "—"
+                        who      = "—"
+                    missed.append([
+                        date_str,
+                        acct,
+                        _DOW_NAMES[dow],
+                        exp_hrs,
+                        actual if actual else "",
+                        gap,
+                        next_str,
+                        who,
+                    ])
+                d += timedelta(days=7)
+
+    # Sort most-recent first
+    missed.sort(key=lambda r: r[0], reverse=True)
+    return [header] + missed
+
+
 def rebuild_summaries(
     od: OneDriveClient,
     user_id: str,
@@ -412,9 +494,11 @@ def rebuild_summaries(
         "Weekly Variance":  build_weekly_variance(rows, exp_weekly, exclude=excl),
         "Monthly Variance": build_monthly_variance(rows, exp_monthly, exclude=excl),
         "Daily Variance":   build_daily_variance(rows, exp_daily, expected_weekly=exp_weekly, exclude=excl),
+        "Missed Visits":    build_missed_visits(rows, exp_daily, exclude=excl),
     }
 
     od.ensure_worksheet(user_id, item_id, "Daily Variance")
+    od.ensure_worksheet(user_id, item_id, "Missed Visits")
 
     for sheet, table in tables.items():
         if not table:
