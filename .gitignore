@@ -1,0 +1,4 @@
+quickbooks_onedrive_sync/.env
+quickbooks_onedrive_sync/__pycache__/
+*.pyc
+*.log
