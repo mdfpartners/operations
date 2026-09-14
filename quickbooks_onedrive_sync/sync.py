@@ -31,7 +31,7 @@ HEADER     = ["Date", "Customer", "Employee", "Hours"]
 SHEET_NAME = "Raw Data"
 
 EXPECTED_WEEKLY: dict[str, float] = {
-    "Accel Entertainment":                       11,
+    "Accel Entertainment":                        5,
     "Bethel Lutheran Church and School":         42,
     "Blunier Builders":                           4,
     "CTI":                                        6,
@@ -42,7 +42,7 @@ EXPECTED_WEEKLY: dict[str, float] = {
     "IUOE 649":                                   4,
     "Metamora Christian Union Church":            5.5,
     "Metamora Industries":                       13,
-    "Morton Industries":                          8,
+    "Morton Industries":                          4.5,
     "Office/Management Time":                    15,
     "Peoria County Veteran Assistance Commission": 1.8,
     "Peoria Park District":                       7.5,
@@ -66,15 +66,14 @@ EXPECTED_DAILY: dict[str, dict[int, float]] = {
     # User-specified schedule:
     "Bethel Lutheran Church and School": {0: 6,    1: 12,   2: 6,    3: 6,    4: 12  },
     # Derived from historical data:
-    "Accel Entertainment":             {0: 2.8,  2: 3.7,  4: 3.3                   },
+    "Accel Entertainment":             {0: 1.7,  2: 1.7,  4: 1.6                   },  # 5 hrs/wk at new facility
     "Blunier Builders":                {5: 4.0                                       },
     "Contech Engineered Solutions":    {0: 3.0,  3: 3.2                             },
     "CTI":                             {1: 1.5                                       },
     "IUOE 649":                        {1: 1.7,  6: 1.7                             },
     "Metamora Christian Union Church": {3: 5.6                                       },
     "Metamora Industries":             {1: 5.5,  3: 5.5                             },
-    "Morton Industries":               {1: 3.75, 4: 3.75                            },
-    "Peoria Park District":            {1: 4.25, 4: 4.0                             },
+    "Morton Industries":               {1: 2.25, 4: 2.25                            },  # 4.5 hrs/wk as quoted
     "Thermosystem, LLC":               {0: 1.4                                       },
     "Winpak Heat Seal Corporation":    {0: 9.0,  1: 6.5,  2: 6.5,  3: 9.0, 4: 6.5 },
     "Woodford County Health Department":  {0: 2.5, 1: 2.5, 2: 2.5, 3: 2.5         },
