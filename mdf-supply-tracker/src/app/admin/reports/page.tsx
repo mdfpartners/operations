@@ -96,6 +96,8 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
       }, 0) / completed.length).toFixed(1)
     : null
 
+  const totalSpend = Object.values(spendByAccount).reduce((s, a) => s + a.total, 0)
+
   const delayed = all.filter((o) => o.status === 'delayed')
   const eightPlusOpen = open.filter((o) => {
     const bucket = getAgingBucket(o.submitted_at, o.status as OrderStatus, o.completed_at, o.cancelled_at)
@@ -153,7 +155,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
       </form>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         <div className="bg-white rounded-lg shadow-sm p-4">
           <p className="text-xs text-gray-500">Total Orders</p>
           <p className="text-3xl font-bold text-gray-900">{all.length}</p>
@@ -165,6 +167,10 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
         <div className="bg-white rounded-lg shadow-sm p-4">
           <p className="text-xs text-gray-500">8+ Day Open</p>
           <p className="text-3xl font-bold text-red-700">{eightPlusOpen.length}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <p className="text-xs text-gray-500">Total Spend</p>
+          <p className="text-3xl font-bold text-gray-900">${totalSpend.toFixed(2)}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4">
           <p className="text-xs text-gray-500">Avg Days to Complete</p>
