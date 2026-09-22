@@ -2,9 +2,9 @@ name: QuickBooks → OneDrive Daily Sync
 
 on:
   schedule:
-    # 6:00 AM CT — runs at 11:00 UTC (CDT, UTC-5) Sep–Nov
-    # Adjust to 12:00 UTC when CST (UTC-6) Nov–Mar
-    - cron: '0 11 * * *'
+    # 11:30 PM CT — runs at 4:30 UTC next day (CDT, UTC-5) Sep–Nov
+    # Adjust to 5:30 UTC when CST (UTC-6) Nov–Mar
+    - cron: '30 4 * * *'
   workflow_dispatch:   # allow manual trigger from GitHub Actions UI
 
 jobs:
@@ -37,4 +37,4 @@ jobs:
           ONEDRIVE_USER:       ${{ secrets.ONEDRIVE_USER }}
           VARIANCE_EMAIL_TO:   ${{ secrets.VARIANCE_EMAIL_TO }}
           DEFAULT_DAYS_BACK:   '1'
-        run: python sync.py --send-email --email-to "$VARIANCE_EMAIL_TO"
+        run: python sync.py --send-email --email-to "$VARIANCE_EMAIL_TO" --include-today
