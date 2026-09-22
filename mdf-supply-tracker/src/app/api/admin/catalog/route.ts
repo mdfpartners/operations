@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { item_name, category, unit_of_measure, preferred_vendor_id, default_notes, active } = body
   if (!item_name?.trim()) return NextResponse.json({ error: 'Item name is required' }, { status: 400 })
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
   const { data, error } = await supabase.from('supply_catalog').insert({
     item_name: item_name.trim(),
     category: category?.trim() || null,

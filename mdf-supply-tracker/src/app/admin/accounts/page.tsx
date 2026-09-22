@@ -1,5 +1,5 @@
 export const runtime = 'edge'
-export const dynamic = 'force-dynamic'
+export const revalidate = 30
 
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import SimpleManager from '@/components/admin/SimpleManager'
@@ -7,7 +7,6 @@ import SimpleManager from '@/components/admin/SimpleManager'
 export default async function AccountsPage() {
   const supabase = createSupabaseServiceClient()
   const { data: accounts } = await supabase.from('accounts').select('*').order('name')
-
   return (
     <SimpleManager
       title="Accounts"
