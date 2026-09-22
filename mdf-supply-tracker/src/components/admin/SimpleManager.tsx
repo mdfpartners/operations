@@ -14,31 +14,32 @@ interface Column {
   key: string
   label: string
   type?: 'url'
-  render?: (value: any, row: any) => React.ReactNode
+  render?: (value: unknown, row: Record<string, unknown>) => React.ReactNode
 }
+
+type Item = Record<string, unknown>
 
 interface Props {
   title: string
-  items: any[]
+  items: Item[]
   apiBase: string
   fields: Field[]
   columns: Column[]
 }
 
 export default function SimpleManager({ title, items, apiBase, fields, columns }: Props) {
-  const [list, setList] = useState(items)
-  const [editing, setEditing] = useState<any>(null)
+  const [editing, setEditing] = useState<Item | null>(null)
   const [isNew, setIsNew] = useState(false)
   const [msg, setMsg] = useState('')
 
   const emptyForm = fields.reduce((acc, f) => {
     acc[f.key] = f.type === 'checkbox' ? true : ''
     return acc
-  }, {} as any)
+  }, {} as Item)
 
   async function save() {
     const method = isNew ? 'POST' : 'PATCH'
-    const url = isNew ? apiBase : `${apiBase}/${editing.id}`
+    const url = isNew ? apiBase : `${apiBase}/${editing?.id}`
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
@@ -54,7 +55,7 @@ export default function SimpleManager({ title, items, apiBase, fields, columns }
     }
   }
 
-  async function toggleActive(item: any) {
+  async function toggleActive(item: Item) {
     await fetch(`${apiBase}/${item.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -94,7 +95,7 @@ export default function SimpleManager({ title, items, apiBase, fields, columns }
                   </div>
                 ) : f.type === 'select' ? (
                   <select
-                    value={editing[f.key] || ''}
+                    value={(editing[f.key] as string) || ''}
                     onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })}
                     className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5"
                   >
@@ -103,7 +104,7 @@ export default function SimpleManager({ title, items, apiBase, fields, columns }
                 ) : (
                   <input
                     type={f.type || 'text'}
-                    value={editing[f.key] || ''}
+                    value={(editing[f.key] as string) || ''}
                     onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })}
                     className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm mt-0.5"
                   />
@@ -130,11 +131,11 @@ export default function SimpleManager({ title, items, apiBase, fields, columns }
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {list.map((item) => (
-              <tr key={item.id} className={item.active ? '' : 'opacity-50'}>
+            {items.map((item) => (
+              <tr key={item.id as string} className={item.active ? '' : 'opacity-50'}>
                 {columns.map((c) => (
                   <td key={c.key} className="px-4 py-3 text-gray-700">
-                    {c.render ? c.render(item[c.key], item) : c.type === 'url' && item[c.key] ? <a href={item[c.key]} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">{item[c.key]}</a> : item[c.key] || '—'}
+                    {c.render ? c.render(item[c.key], item) : c.type === 'url' && item[c.key] ? <a href={item[c.key] as string} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">{item[c.key] as string}</a> : (item[c.key] as string) || '—'}
                   </td>
                 ))}
                 <td className="px-4 py-3">
