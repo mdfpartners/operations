@@ -37,4 +37,4 @@ jobs:
           ONEDRIVE_USER:       ${{ secrets.ONEDRIVE_USER }}
           VARIANCE_EMAIL_TO:   ${{ secrets.VARIANCE_EMAIL_TO }}
           DEFAULT_DAYS_BACK:   '1'
-        run: python sync.py --send-email --email-to "$VARIANCE_EMAIL_TO" --include-today
+        run: python sync.py --send-email --email-to "$VARIANCE_EMAIL_TO"
