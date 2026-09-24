@@ -31,7 +31,7 @@ HEADER     = ["Date", "Customer", "Employee", "Hours"]
 SHEET_NAME = "Raw Data"
 
 EXPECTED_WEEKLY: dict[str, float] = {
-    "Accel Entertainment":                        5,
+    "Accel Entertainment":                        5.5,
     "Bethel Lutheran Church and School":         42,
     "Blunier Builders":                           4,
     "CTI":                                        6,
@@ -66,7 +66,7 @@ EXPECTED_DAILY: dict[str, dict[int, float]] = {
     # User-specified schedule:
     "Bethel Lutheran Church and School": {0: 6,    1: 12,   2: 6,    3: 6,    4: 12  },
     # Derived from historical data:
-    "Accel Entertainment":             {0: 1.7,  2: 1.7,  4: 1.6                   },  # 5 hrs/wk at new facility
+    "Accel Entertainment":             {0: 1.85, 2: 1.85, 4: 1.8                   },  # 5.5 hrs/wk at new facility
     "Blunier Builders":                {5: 4.0                                       },
     "Contech Engineered Solutions":    {0: 3.0,  3: 3.2                             },
     "CTI":                             {1: 1.5                                       },
