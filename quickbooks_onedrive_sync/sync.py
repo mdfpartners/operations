@@ -67,7 +67,7 @@ EXPECTED_DAILY: dict[str, dict[int, float]] = {
     "Bethel Lutheran Church and School": {0: 6,    1: 12,   2: 6,    3: 6,    4: 12  },
     # Derived from historical data:
     "Accel Entertainment":             {0: 1.85, 2: 1.85, 4: 1.8                   },  # 5.5 hrs/wk at new facility
-    "Blunier Builders":                {5: 4.0                                       },
+    "Blunier Builders":                {2: 4.0                                       },
     "Contech Engineered Solutions":    {0: 3.0,  3: 3.2                             },
     "CTI":                             {1: 1.5                                       },
     "IUOE 649":                        {1: 1.7,  6: 1.7                             },
