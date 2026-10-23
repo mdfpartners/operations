@@ -16,7 +16,7 @@ function toCSV(headers: string[], rows: string[][]): string {
 }
 
 export async function GET() {
-  const supabase = await createSupabaseServiceClient()
+  const supabase = createSupabaseServiceClient()
   const { data: orders } = await supabase
     .from('supply_requests')
     .select(`

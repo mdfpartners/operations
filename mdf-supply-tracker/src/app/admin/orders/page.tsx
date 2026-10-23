@@ -28,7 +28,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
     .from('supply_requests')
     .select(`
       id, order_number, status, urgency, submitted_at, completed_at, cancelled_at, created_at,
-      requester_name,
+      requester:app_users(name),
       account:accounts(id, name),
       purchase_details:request_line_items(purchase_details(total_cost))
     `)
@@ -40,6 +40,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
   if (sp.urgency) ordersQuery = ordersQuery.eq('urgency', sp.urgency)
   if (sp.account) ordersQuery = ordersQuery.eq('account_id', sp.account)
 
+  // Run both queries in parallel
   const [{ data: orders }, { data: accounts }] = await Promise.all([
     ordersQuery,
     supabase.from('accounts').select('id, name').eq('active', true).order('name'),
@@ -68,6 +69,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
         </Link>
       </div>
 
+      {/* Filters */}
       <form method="GET" className="flex flex-wrap gap-3 mb-4">
         {showAll && <input type="hidden" name="show" value="all" />}
         <select name="account" defaultValue={sp.account || ''} className="border border-gray-300 rounded-md px-2 py-1.5 text-sm">
@@ -111,6 +113,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredRows.map((o: any) => {
+                  const requester = o.requester as { name: string } | null
                   const account = o.account as { id: string; name: string } | null
                   return (
                     <tr key={o.id} className="hover:bg-gray-50">
@@ -120,7 +123,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-gray-700">{account?.name}</td>
-                      <td className="px-4 py-3 text-gray-700">{o.requester_name}</td>
+                      <td className="px-4 py-3 text-gray-700">{requester?.name}</td>
                       <td className="px-4 py-3 text-gray-500">
                         {new Date(o.submitted_at).toLocaleDateString('en-US', { timeZone: 'America/Chicago' })}
                       </td>

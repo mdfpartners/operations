@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
-import { sendInternalNewRequestNotification, sendRequesterConfirmation } from '@/lib/email'
+import { sendRequesterConfirmation, sendInternalNewRequestNotification } from '@/lib/email'
 import type { UrgencyLevel } from '@/types'
 
 const ALLOWED_URGENCIES: UrgencyLevel[] = [
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
   const supabase = createSupabaseServiceClient()
 
-  // Validate account exists and is active
+  // Validate account is active
   const { data: account } = await supabase
     .from('accounts')
     .select('id, name')
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid account' }, { status: 400 })
   }
 
-  // Validate and resolve line items
+  // Validate line items
   const resolvedItems: {
     catalogItemId: string | null
     otherDescription: string | null
@@ -45,8 +45,8 @@ export async function POST(request: NextRequest) {
   }[] = []
 
   for (const li of lineItems) {
-    const qty = parseFloat(li.quantity)
-    if (!li.catalogItemId || isNaN(qty) || qty <= 0) {
+    const qty = parseInt(li.quantity, 10)
+    if (!li.catalogItemId || isNaN(qty) || qty < 1) {
       return NextResponse.json({ error: 'Invalid line item data' }, { status: 400 })
     }
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     .from('supply_requests')
     .insert({
       requester_name: requesterName.trim(),
-      requester_email: requesterEmail || null,
+      requester_email: requesterEmail?.trim() || null,
       account_id: accountId,
       urgency,
       requester_notes: notes?.trim() || null,
@@ -99,14 +99,13 @@ export async function POST(request: NextRequest) {
   }
 
   // Insert line items
-  await supabase.from('request_line_items').insert(
-    resolvedItems.map((li) => ({
-      request_id: supplyRequest.id,
-      catalog_item_id: li.catalogItemId,
-      other_item_description: li.otherDescription,
-      quantity_requested: li.quantity,
-    }))
-  )
+  const lineItemRows = resolvedItems.map((li) => ({
+    request_id: supplyRequest.id,
+    catalog_item_id: li.catalogItemId,
+    other_item_description: li.otherDescription,
+    quantity_requested: li.quantity,
+  }))
+  await supabase.from('request_line_items').insert(lineItemRows)
 
   // Audit log
   await supabase.from('audit_log').insert({
@@ -116,19 +115,19 @@ export async function POST(request: NextRequest) {
     new_value: { order_number: supplyRequest.order_number, urgency, account_id: accountId },
   })
 
-  // Requester confirmation if email provided
-  if (requesterEmail) {
+  // Send confirmation to requester if email provided
+  if (requesterEmail?.trim()) {
     await sendRequesterConfirmation({
       requestId: supplyRequest.id,
       orderNumber: supplyRequest.order_number,
       accountName: account.name,
       submittedAt: supplyRequest.submitted_at,
-      requesterEmail,
+      requesterEmail: requesterEmail.trim(),
       publicStatusToken: supplyRequest.public_status_token,
     }).catch((err) => console.error('Confirmation email error', err))
   }
 
-  // Internal notification
+  // Notify internal team
   await sendInternalNewRequestNotification({
     requestId: supplyRequest.id,
     orderNumber: supplyRequest.order_number,
@@ -142,5 +141,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     orderNumber: supplyRequest.order_number,
     requestId: supplyRequest.id,
+    statusToken: supplyRequest.public_status_token,
   })
 }

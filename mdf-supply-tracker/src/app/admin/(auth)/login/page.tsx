@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 
 function LoginForm() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const from = searchParams.get('from') || '/admin/orders'
   const [password, setPassword] = useState('')

@@ -15,12 +15,14 @@ export default async function OrderDetailPage({ params }: PageProps) {
   const { id } = await params
   const supabase = createSupabaseServiceClient()
 
+  // Fetch order first so we can get account_id for the related queries
   const { data: order } = await supabase
     .from('supply_requests')
     .select(`
       id, order_number, status, urgency, requester_notes, internal_notes,
       submitted_at, completed_at, cancelled_at, public_status_token, created_at, updated_at,
-      account_id, requester_name,
+      account_id,
+      requester:app_users(id, name, email),
       account:accounts(id, name),
       request_line_items(
         id, quantity_requested, quantity_purchased, line_status, other_item_description,
@@ -40,6 +42,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
   const fourteenDaysAgo = new Date()
   fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14)
 
+  // Run all secondary queries in parallel
   const [
     { data: recentRequests },
     { data: auditLog },

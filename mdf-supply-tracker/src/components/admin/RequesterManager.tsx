@@ -31,14 +31,14 @@ export default function RequesterManager({
   accounts: { id: string; name: string }[]
   baseUrl: string
 }) {
-  const [editing, setEditing] = useState<any>(null)
+  const [editing, setEditing] = useState<(Requester & { accountIds?: string[] }) | null>(null)
   const [isNew, setIsNew] = useState(false)
   const [msg, setMsg] = useState('')
   const [copied, setCopied] = useState<string | null>(null)
 
   async function save() {
     const method = isNew ? 'POST' : 'PATCH'
-    const url = isNew ? '/api/admin/requesters' : `/api/admin/requesters/${editing.id}`
+    const url = isNew ? '/api/admin/requesters' : `/api/admin/requesters/${editing?.id}`
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ export default function RequesterManager({
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-900">Requesters / Site Leads</h1>
         <button
-          onClick={() => { setEditing({ ...EMPTY_FORM }); setIsNew(true) }}
+          onClick={() => { setEditing(EMPTY_FORM as unknown as Requester & { accountIds?: string[] }); setIsNew(true) }}
           className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-blue-700"
         >
           + Add Requester

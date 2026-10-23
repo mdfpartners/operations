@@ -32,7 +32,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
   const [lineItems, setLineItems] = useState<LineItem[]>([{ ...EMPTY_LINE }])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
-  const [orderNumber, setOrderNumber] = useState<string | null>(null)
+  const [submitted, setSubmitted] = useState<{ orderNumber: string; statusToken?: string } | null>(null)
 
   function addLineItem() {
     setLineItems((prev) => [...prev, { ...EMPTY_LINE }])
@@ -53,7 +53,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
 
   function validate(): boolean {
     const errs: Record<string, string> = {}
-    if (!requesterName.trim()) errs.requesterName = 'Please enter your name'
+    if (!requesterName.trim()) errs.requesterName = 'Your name is required'
     if (!accountId) errs.accountId = 'Please select an account'
     if (!urgency) errs.urgency = 'Please select an urgency level'
     if (lineItems.length === 0) errs.lineItems = 'At least one item is required'
@@ -62,9 +62,9 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
       if (li.catalogItemId === 'other' && !li.otherDescription.trim()) {
         errs[`line_${i}_other`] = 'Item description is required'
       }
-      const qty = parseFloat(li.quantity)
-      if (!li.quantity || isNaN(qty) || qty <= 0) {
-        errs[`line_${i}_qty`] = 'Quantity must be greater than 0'
+      const qty = parseInt(li.quantity, 10)
+      if (!li.quantity || isNaN(qty) || qty < 1 || String(qty) !== String(Math.floor(Number(li.quantity)))) {
+        errs[`line_${i}_qty`] = 'Quantity must be a whole number (1 or more)'
       }
     })
     setErrors(errs)
@@ -79,11 +79,11 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
       const res = await fetch('/api/request/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requesterName: requesterName.trim(), requesterEmail: requesterEmail.trim() || null, accountId, urgency, notes, lineItems }),
+        body: JSON.stringify({ requesterName, requesterEmail, accountId, urgency, notes, lineItems }),
       })
       const data = await res.json()
       if (res.ok) {
-        setOrderNumber(data.orderNumber)
+        setSubmitted({ orderNumber: data.orderNumber, statusToken: data.statusToken })
       } else {
         setErrors({ form: data.error || 'Submission failed — please try again.' })
       }
@@ -94,7 +94,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
     }
   }
 
-  if (orderNumber) {
+  if (submitted) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <div className="text-4xl mb-4">✓</div>
@@ -102,11 +102,23 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
         <p className="text-gray-600 mb-4">Your supply request has been received.</p>
         <div className="bg-gray-50 rounded-md px-4 py-3 inline-block">
           <p className="text-sm text-gray-500">Order Number</p>
-          <p className="text-2xl font-bold text-blue-700">{orderNumber}</p>
+          <p className="text-2xl font-bold text-blue-700">{submitted.orderNumber}</p>
         </div>
+        {requesterEmail && (
+          <p className="text-gray-500 text-sm mt-4">
+            A confirmation has been sent to <strong>{requesterEmail}</strong>.
+          </p>
+        )}
+        {submitted.statusToken && (
+          <p className="mt-3">
+            <a href={`/status/${submitted.statusToken}`} className="text-blue-600 hover:underline text-sm">
+              Track order status →
+            </a>
+          </p>
+        )}
         <button
           onClick={() => {
-            setOrderNumber(null)
+            setSubmitted(null)
             setRequesterName('')
             setRequesterEmail('')
             setLineItems([{ ...EMPTY_LINE }])
@@ -115,7 +127,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
             setAccountId(accounts.length === 1 ? accounts[0].id : '')
             setErrors({})
           }}
-          className="mt-6 block mx-auto text-blue-600 hover:text-blue-800 text-sm font-medium underline underline-offset-2"
+          className="mt-6 text-blue-600 hover:text-blue-800 text-sm font-medium underline underline-offset-2"
         >
           Submit another request
         </button>
@@ -123,51 +135,52 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
     )
   }
 
+  // Group catalog items by category for dropdown
   const categories = Array.from(new Set(catalogItems.map((c) => c.category || 'Other'))).sort()
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Your Name */}
-      <div className="bg-white rounded-lg shadow-sm p-4">
-        <label htmlFor="requesterName" className="block text-sm font-medium text-gray-700 mb-1">
-          Your Name <span className="text-red-500">*</span>
-        </label>
-        <input
-          id="requesterName"
-          type="text"
-          value={requesterName}
-          onChange={(e) => setRequesterName(e.target.value)}
-          placeholder="First and last name"
-          className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {errors.requesterName && <p className="text-red-500 text-xs mt-1">{errors.requesterName}</p>}
-      </div>
-
-      {/* Email (optional) */}
-      <div className="bg-white rounded-lg shadow-sm p-4">
-        <label htmlFor="requesterEmail" className="block text-sm font-medium text-gray-700 mb-1">
-          Your Email <span className="text-gray-400 font-normal">(optional — for status updates)</span>
-        </label>
-        <input
-          id="requesterEmail"
-          type="email"
-          value={requesterEmail}
-          onChange={(e) => setRequesterEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      {/* Requester name + email */}
+      <div className="bg-white rounded-lg shadow-sm p-4 space-y-3">
+        <div>
+          <label htmlFor="requesterName" className="block text-base font-medium text-gray-800 mb-1.5">
+            Your Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="requesterName"
+            type="text"
+            value={requesterName}
+            onChange={(e) => setRequesterName(e.target.value)}
+            placeholder="First and last name"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.requesterName && <p className="text-red-500 text-xs mt-1">{errors.requesterName}</p>}
+        </div>
+        <div>
+          <label htmlFor="requesterEmail" className="block text-base font-medium text-gray-800 mb-1.5">
+            Your Email <span className="text-gray-400 font-normal">(optional — for status updates)</span>
+          </label>
+          <input
+            id="requesterEmail"
+            type="email"
+            value={requesterEmail}
+            onChange={(e) => setRequesterEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
       </div>
 
       {/* Account */}
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <label htmlFor="account" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="account" className="block text-base font-medium text-gray-800 mb-1.5">
           Account <span className="text-red-500">*</span>
         </label>
         <select
           id="account"
           value={accountId}
           onChange={(e) => setAccountId(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select account…</option>
           {accounts.map((a) => (
@@ -179,14 +192,14 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
 
       {/* Urgency */}
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <label htmlFor="urgency" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="urgency" className="block text-base font-medium text-gray-800 mb-1.5">
           Urgency <span className="text-red-500">*</span>
         </label>
         <select
           id="urgency"
           value={urgency}
           onChange={(e) => setUrgency(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select urgency…</option>
           {URGENCY_LEVELS.map((u) => (
@@ -224,7 +237,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
                 <select
                   value={li.catalogItemId}
                   onChange={(e) => updateLine(i, 'catalogItemId', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select item…</option>
                   {categories.map((cat) => (
@@ -253,7 +266,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
                       placeholder="Describe the item…"
                       value={li.otherDescription}
                       onChange={(e) => updateLine(i, 'otherDescription', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     {errors[`line_${i}_other`] && (
                       <p className="text-red-500 text-xs mt-1">{errors[`line_${i}_other`]}</p>
@@ -264,15 +277,15 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
-                    min="0.01"
-                    step="any"
+                    min="1"
+                    step="1"
                     placeholder="Qty"
                     value={li.quantity}
                     onChange={(e) => updateLine(i, 'quantity', e.target.value)}
-                    className="w-28 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-28 border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {selectedItem?.unit_of_measure && (
-                    <span className="text-sm text-gray-500">{selectedItem.unit_of_measure}</span>
+                    <span className="text-base text-gray-600">{selectedItem.unit_of_measure}</span>
                   )}
                 </div>
                 {errors[`line_${i}_qty`] && (
@@ -294,7 +307,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
 
       {/* Notes */}
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="notes" className="block text-base font-medium text-gray-800 mb-1.5">
           Notes (optional)
         </label>
         <textarea
@@ -303,7 +316,7 @@ export default function RequestForm({ accounts, catalogItems }: Props) {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Any additional notes for the supply team…"
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-md px-3 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 

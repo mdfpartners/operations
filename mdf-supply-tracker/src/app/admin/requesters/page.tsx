@@ -1,11 +1,12 @@
 export const runtime = 'edge'
-export const dynamic = 'force-dynamic'
+export const revalidate = 30
 
 import { createSupabaseServiceClient } from '@/lib/supabase/server'
 import RequesterManager from '@/components/admin/RequesterManager'
 
 export default async function RequestersPage() {
   const supabase = createSupabaseServiceClient()
+
   const [{ data: requesters }, { data: accounts }] = await Promise.all([
     supabase
       .from('app_users')
