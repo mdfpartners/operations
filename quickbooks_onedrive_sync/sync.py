@@ -50,7 +50,7 @@ EXPECTED_WEEKLY: dict[str, float] = {
     "Troxell Ins. / Summer & Associates":         4,
     "Winpak Heat Seal Corporation":              38,
     "Woodford County Health Department":         13,
-    "Woodford County Sheriff's Office":          86.75,
+    "Woodford County Sheriff's Office":          85.75,
 }
 
 EXPECTED_MONTHLY: dict[str, float] = {
@@ -78,7 +78,7 @@ EXPECTED_DAILY: dict[str, dict[int, float]] = {
     "Winpak Heat Seal Corporation":    {0: 9.0,  1: 6.5,  2: 6.5,  3: 9.0, 4: 6.5 },
     "Woodford County Health Department":  {0: 2.5, 1: 2.5, 2: 2.5, 3: 2.5         },
     "Woodford County Sheriff's Office":   {0: 16.5, 1: 14.0, 2: 18.0, 3: 9.5,
-                                           4: 9.5,  5: 2.5,  6: 2.5              },
+                                           4: 9.5,  5: 2.0,  6: 2.0              },
 }
 
 
